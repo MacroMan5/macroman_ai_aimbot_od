@@ -40,3 +40,26 @@ TEST_CASE("Kalman prediction with constant velocity", "[tracking][kalman]") {
 
     REQUIRE_THAT(predicted.x, WithinAbs(196.0f, 30.0f));  // Accept 166-226 range
 }
+
+TEST_CASE("Kalman state propagation during coasting", "[tracking][kalman]") {
+    KalmanPredictor predictor;
+    KalmanState state;
+
+    // Initialize state with high velocity
+    state.x = 100.0f;
+    state.y = 100.0f;
+    state.vx = 1000.0f; // 1000 px/s
+    state.vy = 0.0f;
+
+    // Coast for 1 frame (16ms)
+    predictor.predictState(0.016f, state);
+    
+    // Position should have advanced: 100 + 1000 * 0.016 = 116
+    REQUIRE_THAT(state.x, WithinAbs(116.0f, 0.1f));
+
+    // Coast for another frame
+    predictor.predictState(0.016f, state);
+
+    // Position should have advanced again: 116 + 1000 * 0.016 = 132
+    REQUIRE_THAT(state.x, WithinAbs(132.0f, 0.1f));
+}

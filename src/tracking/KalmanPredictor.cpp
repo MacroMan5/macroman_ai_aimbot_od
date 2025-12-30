@@ -47,6 +47,24 @@ void KalmanPredictor::update(Vec2 observation, float dt, KalmanState& state) con
     fromEigen(x, P, state);
 }
 
+void KalmanPredictor::predictState(float dt, KalmanState& state) const noexcept {
+    Eigen::Vector4f x; Eigen::Matrix4f P;
+    toEigen(state, x, P);
+
+    // Prediction step only
+    Eigen::Matrix4f F;
+    F << 1, 0, dt, 0,
+         0, 1, 0,  dt,
+         0, 0, 1,  0,
+         0, 0, 0,  1;
+
+    Eigen::Matrix4f Q = Eigen::Matrix4f::Identity() * q_val_;
+    x = F * x;
+    P = F * P * F.transpose() + Q;
+
+    fromEigen(x, P, state);
+}
+
 Vec2 KalmanPredictor::predict(float dt, const KalmanState& state) const noexcept {
     return {
         state.x + state.vx * dt,

@@ -26,7 +26,14 @@ public:
     void update(Vec2 observation, float dt, KalmanState& state) const noexcept;
 
     /**
-     * @brief Predict position ahead in time
+     * @brief Advance state without a new observation (coasting)
+     * @param dt Time to advance
+     * @param state State POD to update
+     */
+    void predictState(float dt, KalmanState& state) const noexcept;
+
+    /**
+     * @brief Predict position ahead in time without modifying state
      * @param dt Time to predict ahead
      * @param state Current state POD
      */

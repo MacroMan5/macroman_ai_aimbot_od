@@ -130,9 +130,14 @@ void TargetTracker::updateTrack(size_t trackIdx, const Detection& detection, flo
 }
 
 void TargetTracker::coastTrack(size_t trackIdx, float dt) {
-    // Predict position using Kalman filter (no correction)
-    Vec2 predicted = kalman_.predict(dt, db_.kalmanStates[trackIdx]);
-    db_.positions[trackIdx] = predicted;
+    // Advance Kalman state (prediction step without correction)
+    kalman_.predictState(dt, db_.kalmanStates[trackIdx]);
+
+    // Update position from newly advanced state
+    db_.positions[trackIdx] = {
+        db_.kalmanStates[trackIdx].x,
+        db_.kalmanStates[trackIdx].y
+    };
 
     // Increment grace period counter
     gracePeriodCounters_[trackIdx] += dt;
