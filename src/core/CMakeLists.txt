@@ -1,22 +1,45 @@
-file(GLOB_RECURSE SOURCES "*.cpp")
-file(GLOB_RECURSE HEADERS "*.h")
+# Core library
 
-add_library(aimbot_core STATIC 
-    ${SOURCES} 
-    ${HEADERS}
+# Fetch spdlog (if not already done at root level, this is redundant but safe)
+include(FetchContent)
+if(NOT TARGET spdlog::spdlog)
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.14.1
+    )
+    FetchContent_MakeAvailable(spdlog)
+endif()
+
+add_library(macroman_core
     threading/ThreadManager.cpp
     utils/Logger.cpp
+    entities/TexturePool.cpp
 )
 
-target_include_directories(aimbot_core PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}    # Allow including "threading/...", "utils/..."
-    ${CMAKE_CURRENT_SOURCE_DIR}/.. # Allow including "core/..."
-    ${OpenCV_INCLUDE_DIRS}
+target_include_directories(macroman_core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/interfaces
+    ${CMAKE_CURRENT_SOURCE_DIR}/entities
+    ${CMAKE_CURRENT_SOURCE_DIR}/threading
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
 )
 
-target_link_libraries(aimbot_core PUBLIC 
-    ${OpenCV_LIBRARIES}
+# Link libraries
+target_link_libraries(macroman_core PUBLIC
     spdlog::spdlog
-    Eigen3::Eigen
     d3d11.lib
+    dxgi.lib
 )
+
+# C++20 features required
+target_compile_features(macroman_core PUBLIC cxx_std_20)
+
+# Platform-specific requirements
+if(WIN32)
+    target_compile_definitions(macroman_core PUBLIC
+        WIN32_LEAN_AND_MEAN
+        NOMINMAX
+        _CRT_SECURE_NO_WARNINGS
+    )
+endif()

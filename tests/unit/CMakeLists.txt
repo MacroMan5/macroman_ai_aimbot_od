@@ -7,8 +7,10 @@ add_executable(unit_tests
 
 # Link libraries
 target_link_libraries(unit_tests PRIVATE
-    aimbot_core
+    macroman_core
     Catch2::Catch2WithMain
+    d3d11.lib
+    dxgi.lib
 )
 
 # Include directories

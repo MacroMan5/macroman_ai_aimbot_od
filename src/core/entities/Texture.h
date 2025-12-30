@@ -36,6 +36,7 @@
 #include <wrl/client.h>
 #include <atomic>
 #include <cstdint>
+#include <memory>
 
 namespace macroman {
 
