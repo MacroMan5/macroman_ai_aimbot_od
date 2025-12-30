@@ -51,46 +51,47 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Eigen)
 
-# 4. OpenCV
+# 4. OpenCV (Optional - minimal usage in Phase 2)
 if(NOT OpenCV_DIR)
     set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/external/opencv/build")
 endif()
-find_package(OpenCV REQUIRED)
-message(STATUS "OpenCV found: ${OpenCV_VERSION}")
+find_package(OpenCV QUIET)
+if(OpenCV_FOUND)
+    message(STATUS "OpenCV found: ${OpenCV_VERSION}")
+else()
+    message(WARNING "OpenCV not found - some features may be unavailable")
+endif()
 
-# 5. ImGui (Build from source)
-file(GLOB IMGUI_SOURCES 
-    "external/imgui/*.cpp" 
-    "external/imgui/backends/imgui_impl_win32.cpp"
-    "external/imgui/backends/imgui_impl_dx11.cpp"
-    "external/imgui/imgui_tables.cpp"
-    "external/imgui/imgui_widgets.cpp"
-    "external/imgui/imgui_draw.cpp"
-)
-add_library(imgui STATIC ${IMGUI_SOURCES})
-target_include_directories(imgui PUBLIC "external/imgui" "external/imgui/backends")
-target_link_libraries(imgui PRIVATE d3d11.lib d3dcompiler.lib dwmapi.lib)
+# 5. ImGui (Build from source) - DISABLED FOR PHASE 2 (UI comes in Phase 5+)
+# file(GLOB IMGUI_SOURCES
+#     "external/imgui/*.cpp"
+#     "external/imgui/backends/imgui_impl_win32.cpp"
+#     "external/imgui/backends/imgui_impl_dx11.cpp"
+# )
+# add_library(imgui STATIC ${IMGUI_SOURCES})
+# target_include_directories(imgui PUBLIC "external/imgui" "external/imgui/backends")
+# target_link_libraries(imgui PRIVATE d3d11.lib d3dcompiler.lib dwmapi.lib)
 
-# 6. SimpleIni
-add_library(simpleini INTERFACE)
-target_include_directories(simpleini INTERFACE "external/simpleini")
+# 6. SimpleIni - DISABLED FOR PHASE 2 (Config comes in Phase 5)
+# add_library(simpleini INTERFACE)
+# target_include_directories(simpleini INTERFACE "external/simpleini")
 
-# 7. GLFW (Imported)
-add_library(glfw STATIC IMPORTED)
-set_target_properties(glfw PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/external/glfw/lib-vc2022/glfw3.lib"
-    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external/glfw/include"
-)
+# 7. GLFW (Imported) - DISABLED FOR PHASE 2 (UI comes in Phase 5+)
+# add_library(glfw STATIC IMPORTED)
+# set_target_properties(glfw PROPERTIES
+#     IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/external/glfw/lib-vc2022/glfw3.lib"
+#     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external/glfw/include"
+# )
 
-# 8. Serial (Manual build to avoid catkin dependency)
-set(SERIAL_SOURCES
-    "external/serial/src/serial.cc"
-    "external/serial/src/impl/win.cc"
-    "external/serial/src/impl/list_ports/list_ports_win.cc"
-)
-add_library(serial STATIC ${SERIAL_SOURCES})
-target_include_directories(serial PUBLIC "external/serial/include")
-target_link_libraries(serial PRIVATE setupapi)
+# 8. Serial (Manual build to avoid catkin dependency) - DISABLED FOR PHASE 2 (Input comes in Phase 4)
+# set(SERIAL_SOURCES
+#     "external/serial/src/serial.cc"
+#     "external/serial/src/impl/win.cc"
+#     "external/serial/src/impl/list_ports/list_ports_win.cc"
+# )
+# add_library(serial STATIC ${SERIAL_SOURCES})
+# target_include_directories(serial PUBLIC "external/serial/include")
+# target_link_libraries(serial PRIVATE setupapi)
 
 # 9. ONNX Runtime (Detected from NuGet)
 set(ONNXRUNTIME_ROOT "C:/Users/therouxe/.nuget/packages/microsoft.ml.onnxruntime.directml/1.22.0")
