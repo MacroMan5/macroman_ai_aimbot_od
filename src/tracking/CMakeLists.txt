@@ -1,6 +1,7 @@
 add_library(macroman_tracking STATIC
     DataAssociation.cpp
     KalmanPredictor.cpp
+    TargetSelector.cpp
 )
 
 target_include_directories(macroman_tracking PUBLIC
