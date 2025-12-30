@@ -12,6 +12,7 @@ add_executable(unit_tests
     test_kalman_predictor.cpp
     test_target_selector.cpp
     test_aim_command.cpp
+    test_target_tracker.cpp
 )
 
 # Link libraries
