@@ -5,6 +5,7 @@ add_executable(unit_tests
     test_latest_frame_queue.cpp
     test_texture_pool.cpp
     test_post_processor.cpp
+    test_math_types.cpp
 )
 
 # Link libraries
