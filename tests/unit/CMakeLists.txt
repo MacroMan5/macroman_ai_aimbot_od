@@ -6,6 +6,7 @@ add_executable(unit_tests
     test_texture_pool.cpp
     test_post_processor.cpp
     test_math_types.cpp
+    test_detection_batch.cpp
 )
 
 # Link libraries
