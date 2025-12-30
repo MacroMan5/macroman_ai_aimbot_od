@@ -1,6 +1,11 @@
-file(GLOB SOURCES "*.cpp")
-file(GLOB HEADERS "*.h")
+add_library(macroman_tracking STATIC
+    DataAssociation.cpp
+)
 
-add_library(aimbot_tracking STATIC ${SOURCES} ${HEADERS})
+target_include_directories(macroman_tracking PUBLIC
+    ${CMAKE_SOURCE_DIR}/src
+)
 
-target_link_libraries(aimbot_tracking PUBLIC aimbot_core)
+target_link_libraries(macroman_tracking PUBLIC
+    macroman_core
+)
