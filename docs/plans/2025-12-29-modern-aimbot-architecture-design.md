@@ -1,6 +1,6 @@
 # Modern AI Aimbot - Architecture Design Document
 
-**Project:** Marcoman AI Aimbot (Modern C++ Rewrite)
+**Project:** Macroman AI Aimbot (Modern C++ Rewrite)
 **Date:** 2025-12-29
 **Version:** 1.0 (MVP Scope)
 **Author:** Design Session with Claude Code
@@ -722,8 +722,8 @@ ShowDebugInfo=true
 Theme=Dark
 
 [IPC]
-SharedMemoryName=MarcomanAimbot_Config
-CommandPipeName=MarcomanAimbot_Commands
+SharedMemoryName=MacromanAimbot_Config
+CommandPipeName=MacromanAimbot_Commands
 ```
 
 **2. Game Profiles (`config/games/{game_name}.json`)**
@@ -1343,8 +1343,8 @@ void inputLoop() {
 **Build Steps:**
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/marcoman_ai_aimbot.git
-cd marcoman_ai_aimbot
+git clone https://github.com/yourusername/macroman_ai_aimbot.git
+cd macroman_ai_aimbot
 
 # Configure CMake
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
@@ -1367,7 +1367,7 @@ cmake --install build --prefix install
 ### C. Directory Structure
 
 ```
-marcoman_ai_aimbot/
+macroman_ai_aimbot/
 ├── CMakeLists.txt
 ├── CMakePresets.json
 ├── README.md
@@ -1535,10 +1535,10 @@ marcoman_ai_aimbot/
 
 ### G. Contact & Support
 
-**Developer:** Marcoman (therouxe)
-**Repository:** [GitHub - marcoman_ai_aimbot](https://github.com/yourusername/marcoman_ai_aimbot)
+**Developer:** Macroman (therouxe)
+**Repository:** [GitHub - macroman_ai_aimbot](https://github.com/yourusername/macroman_ai_aimbot)
 **License:** TBD
-**Issues:** [GitHub Issues](https://github.com/yourusername/marcoman_ai_aimbot/issues)
+**Issues:** [GitHub Issues](https://github.com/yourusername/macroman_ai_aimbot/issues)
 
 ---
 
