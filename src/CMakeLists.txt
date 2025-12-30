@@ -1,6 +1,7 @@
 # Add subdirectories for modular libraries
 add_subdirectory(core)
-# Capture, detection, input, tracking, config, ui will be added as Phase 2+ progresses
+add_subdirectory(capture)
+# Detection, input, tracking, config, ui will be added as Phase 2+ progresses
 
 # Main Executable (minimal Phase 2 version)
 add_executable(macroman_aimbot main.cpp)
@@ -13,6 +14,7 @@ endif()
 
 target_link_libraries(macroman_aimbot PRIVATE
     macroman_core
+    macroman_capture
     spdlog::spdlog
     d3d11.lib
     dxgi.lib
