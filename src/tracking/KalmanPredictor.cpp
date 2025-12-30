@@ -1,7 +1,7 @@
 #include "KalmanPredictor.h"
 #include <algorithm>
 
-namespace sunone {
+namespace macroman {
 
 KalmanPredictor::KalmanPredictor() {
     initKalman();
@@ -124,4 +124,4 @@ void KalmanPredictor::setMeasurementNoise(float noise) {
     cv::setIdentity(kf_.measurementNoiseCov, cv::Scalar::all(noise));
 }
 
-} // namespace sunone
+} // namespace macroman

@@ -3,7 +3,7 @@
 #include <imgui_impl_dx11.h>
 #include <iostream>
 
-namespace sunone {
+namespace macroman {
 
 ImGuiBackend::ImGuiBackend() = default;
 
@@ -70,4 +70,4 @@ void ImGuiBackend::setLightTheme() {
     ImGui::StyleColorsLight();
 }
 
-} // namespace sunone
+} // namespace macroman

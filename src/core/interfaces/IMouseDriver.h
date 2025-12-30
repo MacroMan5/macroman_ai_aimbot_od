@@ -3,7 +3,7 @@
 #include "../types/Enums.h"
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 class IMouseDriver {
 public:
@@ -29,4 +29,4 @@ public:
     virtual bool supportsHighPrecision() const { return false; }
 };
 
-} // namespace sunone
+} // namespace macroman

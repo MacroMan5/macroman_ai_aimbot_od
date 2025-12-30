@@ -4,7 +4,7 @@
 #include <opencv2/core/types.hpp>
 #include <chrono>
 
-namespace sunone {
+namespace macroman {
 
 struct Target {
     Detection detection;
@@ -35,4 +35,4 @@ struct PredictedPosition {
     std::chrono::milliseconds timeAhead;
 };
 
-} // namespace sunone
+} // namespace macroman

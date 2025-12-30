@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 struct GameProfile {
     std::string profileName = "Default";

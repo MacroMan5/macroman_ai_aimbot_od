@@ -3,7 +3,7 @@
 #include "D3D11Backend.h"
 #include <imgui.h>
 
-namespace sunone {
+namespace macroman {
 
 class ImGuiBackend {
 public:
@@ -26,4 +26,4 @@ private:
     bool initialized_ = false;
 };
 
-} // namespace sunone
+} // namespace macroman

@@ -8,7 +8,7 @@
 #include "directml/DMLDetector.h"
 #endif
 
-namespace sunone {
+namespace macroman {
 
 std::unique_ptr<IDetector> DetectorFactory::create(DetectorType type) {
     switch (type) {
@@ -102,4 +102,4 @@ const char* DetectorFactory::getTypeName(DetectorType type) {
     }
 }
 
-} // namespace sunone
+} // namespace macroman

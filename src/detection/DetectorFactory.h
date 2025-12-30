@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-namespace sunone {
+namespace macroman {
 
 /**
  * Factory for creating detector instances based on backend type.
@@ -49,4 +49,4 @@ public:
     static const char* getTypeName(DetectorType type);
 };
 
-} // namespace sunone
+} // namespace macroman

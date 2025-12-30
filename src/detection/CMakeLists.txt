@@ -1,29 +1,52 @@
-file(GLOB SOURCES "*.cpp" "postprocess/*.cpp")
-file(GLOB HEADERS "*.h" "postprocess/*.h")
+# Detection module - DirectML and TensorRT backends
 
-# DirectML Backend
-file(GLOB DML_SOURCES "directml/*.cpp")
-file(GLOB DML_HEADERS "directml/*.h")
-
-add_library(aimbot_detection STATIC ${SOURCES} ${HEADERS} ${DML_SOURCES} ${DML_HEADERS})
-
-target_include_directories(aimbot_detection PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/directml
-    ${CMAKE_CURRENT_SOURCE_DIR}/tensorrt
-    ${ONNXRUNTIME_INCLUDE_DIR}
+add_library(macroman_detection
+    directml/InputPreprocessor.cpp
+    postprocess/PostProcessor.cpp
 )
 
-target_link_libraries(aimbot_detection PUBLIC 
-    aimbot_core 
-    OpenCV::opencv_core 
-    OpenCV::opencv_imgproc
-    d3d11.lib 
-    d3dcompiler.lib
+target_include_directories(macroman_detection PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src/core
 )
 
-if(USE_CUDA)
-    file(GLOB TRT_SOURCES "tensorrt/*.cpp")
-    file(GLOB TRT_HEADERS "tensorrt/*.h")
-    # Note: .cu handling requires enable_language(CUDA) in root
-    target_sources(aimbot_detection PRIVATE ${TRT_SOURCES} ${TRT_HEADERS})
+# Link libraries
+target_link_libraries(macroman_detection PUBLIC
+    macroman_core
+    onnxruntime
+    d3d11.lib
+    d3dcompiler.lib # For shader compilation if needed, or runtime loading
+)
+
+# Copy ONNX Runtime DLL to output directory
+# We can use the IMPORTED_LOCATION property from the onnxruntime target
+get_target_property(ORT_DLL onnxruntime IMPORTED_LOCATION)
+if(ORT_DLL)
+    add_custom_command(TARGET macroman_detection POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${ORT_DLL}"
+            "$<TARGET_FILE_DIR:macroman_detection>"
+        COMMENT "Copying onnxruntime.dll to output directory"
+    )
 endif()
+
+# Compile HLSL Shader
+# Requires 'fxc' or 'dxc' available in path, or use VS rules.
+# For CMake cross-platform simple approach, we might skip automatic compilation
+# and expect .cso to be present, or use a custom command.
+find_program(FXC_EXECUTABLE fxc)
+if(FXC_EXECUTABLE)
+    add_custom_command(
+        OUTPUT "${CMAKE_BINARY_DIR}/InputPreprocessing.cso"
+        COMMAND ${FXC_EXECUTABLE} /T cs_5_0 /E CSMain /Fo "${CMAKE_BINARY_DIR}/InputPreprocessing.cso" "${CMAKE_CURRENT_SOURCE_DIR}/directml/InputPreprocessing.hlsl"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/directml/InputPreprocessing.hlsl"
+        COMMENT "Compiling Compute Shader"
+    )
+    add_custom_target(CompileShaders ALL DEPENDS "${CMAKE_BINARY_DIR}/InputPreprocessing.cso")
+    add_dependencies(macroman_detection CompileShaders)
+else()
+    message(WARNING "fxc.exe not found. Shaders will not be compiled.")
+endif()
+
+# C++20 features
+target_compile_features(macroman_detection PUBLIC cxx_std_20)

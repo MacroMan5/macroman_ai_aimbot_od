@@ -28,3 +28,6 @@ cmake_install.cmake
 # Dependencies & Pre-compiled binaries
 external/
 modules/
+
+# Git worktrees (isolated development branches)
+.worktrees/

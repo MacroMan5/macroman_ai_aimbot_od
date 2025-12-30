@@ -5,7 +5,7 @@
 #include "../input/movement/TrajectoryPlanner.h" // For TrajectoryConfig
 #include <vector>
 
-namespace sunone {
+namespace macroman {
 
 struct AppConfig {
     // Sub-module configs

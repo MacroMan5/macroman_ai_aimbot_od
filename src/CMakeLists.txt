@@ -1,40 +1,34 @@
-
-# Add submodules
+# Add subdirectories for modular libraries
 add_subdirectory(core)
 add_subdirectory(capture)
 add_subdirectory(detection)
-add_subdirectory(input)
-add_subdirectory(tracking)
-add_subdirectory(config)
-add_subdirectory(ui)
+# Input, tracking, config, ui will be added as Phase 3+ progresses
 
-# Main Executable
-add_executable(MarcomanAimbot main.cpp)
+# Main Executable (minimal Phase 2 version)
+add_executable(macroman_aimbot main.cpp)
 
-target_link_libraries(MarcomanAimbot PRIVATE
-    aimbot_core
-    aimbot_capture
-    aimbot_detection
-    aimbot_input
-    aimbot_config
-    aimbot_ui
-    imgui
-    simpleini
-    glfw
-    serial
-    OpenCV::opencv_core
-    OpenCV::opencv_imgproc
-    OpenCV::opencv_highgui
+# Enable C++/WinRT for main
+if(MSVC)
+    target_compile_options(macroman_aimbot PRIVATE /await)
+    target_link_libraries(macroman_aimbot PRIVATE windowsapp)
+endif()
+
+target_link_libraries(macroman_aimbot PRIVATE
+    macroman_core
+    macroman_capture
+    macroman_detection
+    spdlog::spdlog
     d3d11.lib
     dxgi.lib
 )
 
-# Copy shaders to bin
-file(GLOB HLSL_SHADERS "${CMAKE_SOURCE_DIR}/src/detection/directml/*.hlsl")
-foreach(SHADER ${HLSL_SHADERS})
-    add_custom_command(TARGET MarcomanAimbot POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${SHADER}"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)/"
-    )
-endforeach()
+# Copy shaders to bin (will be populated in detection module tasks)
+# file(GLOB HLSL_SHADERS "${CMAKE_SOURCE_DIR}/src/detection/directml/*.hlsl")
+# foreach(SHADER ${HLSL_SHADERS})
+#     add_custom_command(TARGET macroman_aimbot POST_BUILD
+#         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         "${SHADER}"
+#         "$<TARGET_FILE_DIR:macroman_aimbot>/"
+#         COMMENT "Copying shader ${SHADER}"
+#     )
+# endforeach()

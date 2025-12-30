@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 struct ModelInfo {
     int inputWidth;
@@ -92,4 +92,4 @@ protected:
     DetectorConfig config_;
 };
 
-} // namespace sunone
+} // namespace macroman

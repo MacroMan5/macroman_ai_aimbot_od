@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 
-namespace sunone {
+namespace macroman {
 
 D3D11Backend::D3D11Backend() = default;
 
@@ -161,4 +161,4 @@ void D3D11Backend::releaseRenderTarget() {
     renderTarget_.Reset();
 }
 
-} // namespace sunone
+} // namespace macroman

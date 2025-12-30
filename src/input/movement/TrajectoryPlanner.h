@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../../core/entities/MouseMovement.h"
+#include "core/entities/MouseMovement.h"
 #include "BezierCurve.h"
 #include "OneEuroFilter.h"
 #include <opencv2/core/types.hpp>
 #include <random>
 
-namespace sunone {
+namespace macroman {
 
 /**
  * @struct TrajectoryConfig
@@ -140,4 +140,4 @@ private:
     std::mt19937 rng_{std::random_device{}()};
 };
 
-} // namespace sunone
+} // namespace macroman

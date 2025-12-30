@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace sunone {
+namespace macroman {
 
 TrajectoryPlanner::TrajectoryPlanner(const TrajectoryConfig& config)
     : config_(config) {
@@ -29,8 +29,8 @@ MouseMovement TrajectoryPlanner::plan(const cv::Point2f& current,
     float dt = std::chrono::duration<float>(now - lastTime_).count();
     lastTime_ = now;
     
-    // Clamp dt to avoid huge jumps if thread slept (max 100ms)
-    if (dt > 0.1f) dt = 0.1f;
+    // Clamp dt to avoid huge jumps if thread slept (max 50ms)
+    if (dt > 0.05f) dt = 0.05f;
 
     if (config_.bezierEnabled) {
         return advanceBezier(current, target, dt);
@@ -292,4 +292,4 @@ MouseMovement TrajectoryPlanner::applyWindMouse(const MouseMovement& raw) const 
     return raw;
 }
 
-} // namespace sunone
+} // namespace macroman
