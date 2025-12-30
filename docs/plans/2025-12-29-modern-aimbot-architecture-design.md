@@ -141,9 +141,11 @@ The system uses a **layered hybrid architecture** combining pipeline parallelism
    - GPU inference
 
 2. **Configuration UI** (`marcoman_config.exe`)
+   - Window: 1200x800 (standard windowed app, not transparent)
    - Profile editor
-   - Metrics dashboard
-   - Component swapping
+   - Metrics dashboard (telemetry from SharedConfig)
+   - Live tuning sliders (smoothness, FOV)
+   - Component toggles (read/write SharedConfig atomics)
 
 **Inter-Process Communication:**
 - **Shared Memory**: Hot-path config (smoothness, FOV, enable flags)
@@ -313,6 +315,9 @@ class FrameAllocator {
 
 **Owned by Tracking Thread (No Shared State):**
 ```cpp
+// Unique identifier for tracked targets (persists across frames)
+using TargetID = uint32_t;
+
 struct TargetDatabase {
     static constexpr size_t MAX_TARGETS = 64;
 
@@ -352,19 +357,21 @@ struct TargetDatabase {
 ```cpp
 struct SharedConfig {
     // Hot-path tunables (atomic for lock-free access)
-    std::atomic<float> aimSmoothness{0.5f};
-    std::atomic<float> fov{60.0f};
-    std::atomic<uint32_t> activeProfileId{0};
-    std::atomic<bool> enablePrediction{true};
-    std::atomic<bool> enableAiming{true};
+    alignas(64) std::atomic<float> aimSmoothness{0.5f};
+    alignas(64) std::atomic<float> fov{60.0f};
+    alignas(64) std::atomic<uint32_t> activeProfileId{0};
+    alignas(64) std::atomic<bool> enablePrediction{true};
+    alignas(64) std::atomic<bool> enableAiming{true};
+    alignas(64) std::atomic<bool> enableTracking{true};   // Phase 6: Runtime toggle
+    alignas(64) std::atomic<bool> enableTremor{true};     // Phase 6: Runtime toggle
 
     char padding1[64];  // Avoid false sharing
 
     // Telemetry (written by engine, read by UI)
-    std::atomic<float> currentFPS{0.0f};
-    std::atomic<float> detectionLatency{0.0f};
-    std::atomic<int> activeTargets{0};
-    std::atomic<size_t> vramUsageMB{0};
+    alignas(64) std::atomic<float> currentFPS{0.0f};
+    alignas(64) std::atomic<float> detectionLatency{0.0f};
+    alignas(64) std::atomic<int> activeTargets{0};
+    alignas(64) std::atomic<size_t> vramUsageMB{0};
 };
 ```
 
@@ -372,6 +379,124 @@ struct SharedConfig {
 - **Core Engine**: Reads config every frame (atomic load, ~1 cycle)
 - **Config UI**: Writes when user drags slider (atomic store)
 - **No locks, no syscalls** in the hot path
+
+#### 5. Named Pipes (Cold-Path Commands)
+
+**Purpose:** Send infrequent, blocking commands from Config UI to Engine (e.g., load profile, switch model, shutdown).
+
+**Why Not Shared Memory:** Commands require acknowledgment and may take seconds to complete (e.g., model loading). Atomics are unsuitable for request-response patterns.
+
+**Implementation:**
+```cpp
+// Command types (Config UI → Engine)
+enum class CommandType : uint32_t {
+    LoadProfile = 1,
+    SwitchModel = 2,
+    Shutdown = 3,
+    ReloadModel = 4
+};
+
+struct CommandMessage {
+    CommandType type;
+    char payload[256];  // Profile name, model path, etc.
+};
+
+class CommandPipe {
+    HANDLE hPipe;
+
+public:
+    // Engine side: Create named pipe server
+    bool createServer(const std::string& pipeName = "\\\\.\\pipe\\MacromanAimbot_Commands") {
+        hPipe = CreateNamedPipe(
+            pipeName.c_str(),
+            PIPE_ACCESS_DUPLEX,
+            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+            1,  // Max instances
+            sizeof(CommandMessage),
+            sizeof(CommandMessage),
+            0,
+            nullptr
+        );
+        return hPipe != INVALID_HANDLE_VALUE;
+    }
+
+    // Engine side: Wait for command (blocking)
+    std::optional<CommandMessage> receive() {
+        CommandMessage msg;
+        DWORD bytesRead;
+        if (ReadFile(hPipe, &msg, sizeof(msg), &bytesRead, nullptr)) {
+            return msg;
+        }
+        return std::nullopt;
+    }
+
+    // Config UI side: Connect and send command
+    bool sendCommand(CommandType type, const std::string& payload) {
+        HANDLE hClient = CreateFile(
+            "\\\\.\\pipe\\MacromanAimbot_Commands",
+            GENERIC_WRITE,
+            0,
+            nullptr,
+            OPEN_EXISTING,
+            0,
+            nullptr
+        );
+
+        if (hClient == INVALID_HANDLE_VALUE) return false;
+
+        CommandMessage msg{type, {}};
+        strncpy(msg.payload, payload.c_str(), sizeof(msg.payload) - 1);
+
+        DWORD bytesWritten;
+        bool success = WriteFile(hClient, &msg, sizeof(msg), &bytesWritten, nullptr);
+        CloseHandle(hClient);
+        return success;
+    }
+};
+```
+
+**Usage Pattern:**
+```cpp
+// Engine: Dedicated command thread (low priority)
+void commandHandlerThread() {
+    CommandPipe pipe;
+    pipe.createServer();
+
+    while (running) {
+        auto cmd = pipe.receive();
+        if (!cmd) continue;
+
+        switch (cmd->type) {
+            case CommandType::LoadProfile:
+                LOG_INFO("Loading profile: {}", cmd->payload);
+                profileManager.loadProfile(cmd->payload);
+                break;
+
+            case CommandType::SwitchModel:
+                LOG_INFO("Switching model: {}", cmd->payload);
+                modelManager.switchModel(cmd->payload);
+                break;
+
+            case CommandType::Shutdown:
+                LOG_INFO("Shutdown requested");
+                requestShutdown();
+                break;
+        }
+    }
+}
+
+// Config UI: Send command on button click
+void onLoadProfileButtonClick(const std::string& profileName) {
+    CommandPipe pipe;
+    if (pipe.sendCommand(CommandType::LoadProfile, profileName)) {
+        LOG_INFO("Profile load requested: {}", profileName);
+    } else {
+        LOG_ERROR("Failed to send command - is engine running?");
+    }
+}
+```
+
+**MVP Note:** Named Pipes implementation is **deferred to Phase 5 (Configuration)** or added as optional Phase 6 task. SharedConfig atomics are sufficient for live tuning (primary MVP requirement).
 
 ### Unified Clock & Timestamping
 
@@ -494,6 +619,14 @@ public:
     virtual std::optional<Target> selectBestTarget(const Vec2& crosshairPos, float fov) = 0;
 };
 
+/* 
+ * Track Maintenance Strategy (Grace Period):
+ * - Unmatched targets are NOT removed immediately.
+ * - They enter a "Coast" state where position is predicted but not corrected.
+ * - If not matched within GRACE_PERIOD (e.g., 100ms), they are removed.
+ * - Prevents aim jitter during single-frame detection failures.
+ */
+
 class IPredictor {
 public:
     virtual ~IPredictor() = default;
@@ -560,19 +693,23 @@ public:
         float filterBeta{0.007f};
     };
 
-    Vec2 step(const AimCommand& cmd, const Vec2& predictedTarget);
+    Vec2 step(const AimCommand& cmd, float dt);
 };
 ```
 
 **Bezier Curve Smoothing:**
 - Cubic Bezier from current position to target
-- Control points based on smoothness parameter
+- **Overshoot & Correction:** Mimic human flick shots by overshooting 15% past target and correcting back (t=1.0 to 1.15).
 - Evaluated incrementally over 1000Hz loop
 
 **1 Euro Filter:**
 - Adaptive low-pass filter
 - Reduces jitter during slow movements
 - Maintains responsiveness during flicks
+
+**Safety Mechanisms (Hot Path):**
+- **Deadman Switch:** Stop all movement if `latestCommand` is >200ms old.
+- **Extrapolation Clamp:** Cap prediction at 50ms to prevent screen-edge snapping if detection lags.
 
 **Location:** `extracted_modules/input/`
 
@@ -892,6 +1029,48 @@ struct Metrics {
     std::atomic<int> activeTargets{0};
     std::atomic<float> fps{0.0f};
     std::atomic<size_t> vramUsageMB{0};
+
+    // Safety metrics (from CRITICAL_TRAPS.md)
+    std::atomic<uint64_t> texturePoolStarved{0};     // Trap 1: Pool starvation events
+    std::atomic<uint64_t> stalePredictionEvents{0};  // Trap 2: >50ms extrapolation count
+    std::atomic<uint64_t> deadmanSwitchTriggered{0}; // Trap 4: Safety trigger count
+};
+
+/**
+ * @brief Non-atomic snapshot of Metrics for UI consumption
+ *
+ * UI thread calls Metrics::snapshot() to get a consistent copy
+ * without lock contention. Safe to read across process boundary.
+ */
+struct TelemetryExport {
+    float captureFPS{0.0f};
+    float captureLatency{0.0f};
+    float detectionLatency{0.0f};  // Average detection thread latency
+    float trackingLatency{0.0f};
+    float inputLatency{0.0f};
+
+    int activeTargets{0};
+    size_t vramUsageMB{0};
+
+    uint64_t texturePoolStarved{0};
+    uint64_t stalePredictionEvents{0};
+    uint64_t deadmanSwitchTriggered{0};
+
+    // Create snapshot from atomic Metrics (called by UI thread)
+    static TelemetryExport snapshot(const Metrics& metrics) {
+        TelemetryExport tel;
+        tel.captureFPS = metrics.fps.load(std::memory_order_relaxed);
+        tel.captureLatency = metrics.capture.avgLatency.load(std::memory_order_relaxed);
+        tel.detectionLatency = metrics.detection.avgLatency.load(std::memory_order_relaxed);
+        tel.trackingLatency = metrics.tracking.avgLatency.load(std::memory_order_relaxed);
+        tel.inputLatency = metrics.input.avgLatency.load(std::memory_order_relaxed);
+        tel.activeTargets = metrics.activeTargets.load(std::memory_order_relaxed);
+        tel.vramUsageMB = metrics.vramUsageMB.load(std::memory_order_relaxed);
+        tel.texturePoolStarved = metrics.texturePoolStarved.load(std::memory_order_relaxed);
+        tel.stalePredictionEvents = metrics.stalePredictionEvents.load(std::memory_order_relaxed);
+        tel.deadmanSwitchTriggered = metrics.deadmanSwitchTriggered.load(std::memory_order_relaxed);
+        return tel;
+    }
 };
 
 // Updated in each thread (no locks):
@@ -910,6 +1089,25 @@ void captureThreadLoop() {
 
 **2. Visual Debug Overlay (ImGui)**
 
+**Window Specifications:**
+- Resolution: 800x600 (transparent, frameless)
+- Rendering: OpenGL 3.3 Core, 60 FPS (VSync)
+- Screenshot Protection: `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`
+
+**TargetSnapshot Mechanism:**
+```cpp
+struct TargetSnapshot {
+    static constexpr size_t MAX_TARGETS = 64;
+    std::array<BBox, MAX_TARGETS> bboxes;
+    std::array<float, MAX_TARGETS> confidences;
+    std::array<HitboxType, MAX_TARGETS> hitboxTypes;
+    size_t count{0};
+    size_t selectedTargetIndex{SIZE_MAX};  // Selected by Tracking thread
+};
+// Tracking thread updates Metrics::targetSnapshot (non-atomic copy)
+// UI thread reads for visualization
+```
+
 ```cpp
 void DebugOverlay::render() {
     ImGui::Begin("Debug");
@@ -927,7 +1125,20 @@ void DebugOverlay::render() {
         auto db = targetDatabase.snapshot();
 
         for (size_t i = 0; i < db.count; ++i) {
-            ImU32 color = (i == selectedTarget) ? GREEN : RED;
+            // Primary color: Selected target = GREEN, others by hitbox
+            ImU32 color;
+            if (i == db.selectedTargetIndex) {
+                color = IM_COL32(0, 255, 0, 255);  // GREEN for selected
+            } else {
+                // Secondary: Color by hitbox type
+                switch (db.hitboxTypes[i]) {
+                    case HitboxType::Head:  color = IM_COL32(255, 0, 0, 255); break;    // RED
+                    case HitboxType::Chest: color = IM_COL32(255, 165, 0, 255); break;  // ORANGE
+                    case HitboxType::Body:  color = IM_COL32(255, 255, 0, 255); break;  // YELLOW
+                    default:                color = IM_COL32(128, 128, 128, 255); break; // GRAY
+                }
+            }
+
             drawList->AddRect(
                 ImVec2(db.bboxes[i].x, db.bboxes[i].y),
                 ImVec2(db.bboxes[i].x + db.bboxes[i].w,

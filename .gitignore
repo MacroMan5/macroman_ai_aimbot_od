@@ -24,3 +24,7 @@ cmake_install.cmake
 *.suo
 *.userosscache
 *.sln.docstates
+
+# Dependencies & Pre-compiled binaries
+external/
+modules/

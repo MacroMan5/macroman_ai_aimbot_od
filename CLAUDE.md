@@ -1,215 +1,317 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**MacroMan AI Aimbot v2** - Modern C++20 real-time computer vision pipeline for educational purposes.
 
-## Project Overview
+⚠️ **Educational only** - Vision-based CV learning, NOT for competitive use.
 
-MacroMan AI Aimbot v2 is a modernized C++ implementation of an AI-powered target detection and mouse movement system for first-person shooter games. This project is based on the SunONE C++ aimbot but rebuilt with modern C++ architecture, focusing on modularity, maintainability, and educational value.
+---
 
-**⚠️ IMPORTANT**: This project is strictly educational for learning computer vision, AI inference, and low-level Windows programming. It is NOT intended for competitive or multiplayer game use.
+## 📋 Quick Reference
 
-## Core Architecture
+**Current Status:** @docs/plans/State-Action-Sync/STATUS.md
+**Backlog:** @docs/plans/State-Action-Sync/BACKLOG.md
 
-The project follows a **modular, interface-driven architecture** with clear separation of concerns:
+**Detailed guides:**
+- @docs/plans/2025-12-29-modern-aimbot-architecture-design.md - Full architecture
+- @docs/CRITICAL_TRAPS.md - Implementation failure modes (**READ BEFORE CODING**)
+
+---
+
+## 🔄 State-Action-Sync Workflow
+
+To maintain professional standards while developing with an AI agent, follow this loop:
+
+1.  **State (Sync Context):** Agent reads `docs/plans/State-Action-Sync/STATUS.md` and `docs/plans/State-Action-Sync/BACKLOG.md` to understand the current priority and health.
+2.  **Action (Implementation):** Agent implements **one** atomic task from the backlog, including unit tests and verification.
+3.  **Sync (Update Docs):** Agent updates `BACKLOG.md` (check off task) and `STATUS.md` (update progress/risks) before concluding.
+
+---
+
+## 🔧 Tech Stack
+
+- **Language:** C++20 (MSVC 2022)
+- **Build:** CMake 3.25+
+- **Testing:** Catch2 v3 (unit tests), Google Benchmark (performance)
+- **Logging:** spdlog
+- **Math:** Eigen 3.4 (linear algebra)
+- **CV:** OpenCV 4.10 (minimal utils only)
+- **AI:** ONNX Runtime 1.19+ (DirectML / TensorRT backends)
+- **UI:** Dear ImGui 1.91.2 + GLFW 3.4
+- **Platform:** Windows 10/11 (1903+) - Desktop Duplication API required
+
+---
+
+## 📁 Project Structure
 
 ```
-Capture → Detection → Prediction → Mouse Movement
-  ↓           ↓          ↓              ↓
-Interfaces: IScreenCapture, IDetector, ITargetPredictor, IMouseDriver
+src/                      # Core logic and Application
+├── capture/              # WinrtCapture, DuplicationCapture
+├── config/               # AppConfig, GameProfile
+├── core/                 # Shared foundation
+│   ├── entities/         # Frame, Detection, Target, AimCommand
+│   ├── interfaces/       # IScreenCapture, IDetector, IMouseDriver
+│   ├── threading/        # LatestFrameQueue, ThreadManager
+│   ├── types/            # Common math/geometric types
+│   └── utils/            # PathUtils, Logger
+├── detection/            # DMLDetector, TensorRTDetector, PostProcessor
+├── input/                # Mouse movement & drivers
+├── tracking/             # KalmanPredictor
+├── ui/                   # Overlay & menus (ImGui)
+└── main.cpp              # Application entry point
+
+assets/
+└── models/               # .onnx AI models
+
+external/                 # Third-party source/headers
+modules/                  # Pre-compiled binaries/SDKs (TensorRT, OpenCV, etc.)
 ```
 
-### Key Modules
+---
 
-**1. Capture Layer** (`extracted_modules/capture/`)
-- `DuplicationCapture`: Windows Desktop Duplication API (high performance)
-- `WinrtCapture`: Windows.Graphics.Capture API (compatibility fallback)
-- Interface: `IScreenCapture`
+## 🏗️ Architecture (4-Thread Pipeline)
 
-**2. Detection Layer** (`extracted_modules/detection/`)
-- `DMLDetector`: DirectML backend (universal GPU support - NVIDIA/AMD/Intel)
-- `TensorRTDetector`: CUDA/TensorRT backend (NVIDIA-only, highest performance)
-- `DetectorFactory`: Factory pattern for runtime backend selection
-- `PostProcessor`: NMS and bounding box processing
-- Interface: `IDetector`
+**Lock-free, zero-copy GPU pipeline:**
 
-**3. Prediction Layer** (`extracted_modules/input/prediction/`)
-- `KalmanPredictor`: Kalman filter for target trajectory prediction
-- Interface: `ITargetPredictor`
+```
+Thread 1: Capture (PRIORITY_TIME_CRITICAL)
+   │ WinrtCapture → GPU Texture
+   ▼
+LatestFrameQueue (size=1, head-drop)
+   │
+Thread 2: Detection (PRIORITY_ABOVE_NORMAL)
+   │ DMLDetector/TensorRT → YOLO inference → NMS
+   ▼
+LatestFrameQueue (size=1, head-drop)
+   │
+Thread 3: Tracking (PRIORITY_NORMAL)
+   │ Kalman filter → Target selection → Prediction
+   ▼
+Atomic AimCommand (single variable)
+   │
+Thread 4: Input (PRIORITY_HIGHEST, 1000Hz)
+   │ Bezier + 1 Euro filter → Mouse movement
+```
 
-**4. Input Layer** (`extracted_modules/input/`)
-- **Drivers** (`drivers/`):
-  - `Win32Driver`: Standard Windows mouse input
-  - `ArduinoDriver`: Hardware-based mouse emulation via serial
-  - Interface: `IMouseDriver`
-- **Movement** (`movement/`):
-  - `TrajectoryPlanner`: Bezier curve + OneEuro filter for smooth, human-like movement
-  - `BezierCurve`: Parametric curve generation
-  - `OneEuroFilter`: Low-latency smoothing filter
+**Performance targets:** <10ms end-to-end (P95: 15ms), 144+ FPS capture, 60-144 FPS detection
 
-**5. Configuration** (`extracted_modules/config/`)
-- `AppConfig`: Global application settings
-- `GameProfile`: Per-game detection and movement parameters
+---
 
-**6. Core Utilities** (`extracted_modules/core/`)
-- **Entities**: `Frame`, `Detection`, `Target`, `MouseMovement`
-- **Enums**: Detection mode, mouse driver type, capture method
-- **Threading**: `ThreadSafeQueue` for inter-thread communication
-- **Utils**: `PathUtils` for cross-platform path handling
+## 🚨 Critical Rules (MUST FOLLOW)
 
-## Building the Project
+### DO:
+- ✅ Use `std::unique_ptr`, `std::shared_ptr` (NEVER raw `new`/`delete`)
+- ✅ Use lock-free atomics for inter-thread communication
+- ✅ Pre-allocate in constructors (NO allocations in hot paths)
+- ✅ Read `@docs/CRITICAL_TRAPS.md` before implementing threading/memory code
+- ✅ Write Catch2 unit test BEFORE implementation
+- ✅ Check `src/core/interfaces/` for existing contracts
 
-### Prerequisites
-- **Windows 10/11** (required for Desktop Duplication API)
-- **Visual Studio 2022** with C++ desktop development workload
-- **CMake 3.10+** (included with VS2022)
-- **CUDA Toolkit 12.x** (optional, for TensorRT backend only)
-- **TensorRT 10.x** (optional, included in `modules/TensorRT-10.8.0.43/`)
+### DON'T:
+- ❌ `std::mutex` in thread loops (use `std::atomic` or lock-free queues)
+- ❌ `std::future::get()` in hot path (blocks thread)
+- ❌ `std::vector::push_back()` in frame loops (pre-allocate)
+- ❌ Old C++: `NULL`, `typedef`, raw pointers, `printf`
+- ❌ Read/write game memory (vision-based only)
 
-### Build Commands
+---
 
-#### Using Visual Studio 2022
-1. Open project in VS2022: `File → Open → CMake...` → Select `CMakeLists.txt`
-2. Select configuration: `x64-Debug` or `x64-Release`
-3. Build: `Build → Build All` or `Ctrl+Shift+B`
+## 🏃 Build & Run
 
-#### Using CMake Command Line
+### Quick Start
 ```bash
-# Configure (choose preset)
-cmake --preset x64-debug     # For debug build
-cmake --preset x64-release   # For release build
+# Configure
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
 # Build
-cmake --build out/build/x64-debug
-cmake --build out/build/x64-release
+cmake --build build --config Release -j
 
-# Output location
-# Executable: out/build/<preset>/macroman_ai_aimbot.exe
+# Run tests
+ctest --test-dir build -C Release --output-on-failure
+
+# Output: build/bin/macroman_aimbot.exe
 ```
 
-### Build Configurations
-- **x64-debug**: 64-bit debug with symbols (recommended for development)
-- **x64-release**: 64-bit optimized release
-- **x86-debug/release**: 32-bit builds (legacy support)
+### CMake Options
+- `-DENABLE_TESTS=ON` - Build unit tests (default: ON)
+- `-DENABLE_TENSORRT=ON` - TensorRT backend (requires CUDA 12.x)
+- `-DENABLE_BENCHMARKS=OFF` - Benchmark suite (default: OFF)
 
-## Dependencies & Third-Party Libraries
+---
 
-All dependencies are **pre-compiled and included** in the repository:
+## 🔍 Common Commands
 
-### Core Libraries (`extracted_modules/modules/`)
-- **OpenCV 4.10.0** (`opencv/`): Image processing and computer vision
-- **TensorRT 10.8.0.43** (`TensorRT-10.8.0.43/`): NVIDIA inference engine (optional)
-- **GLFW 3.4** (`glfw-3.4.bin.WIN64/`): Window management and input handling
-- **ImGui 1.91.2** (`imgui-1.91.2/`): Immediate-mode GUI overlay
-- **serial** (`serial/`): Cross-platform serial port communication (for Arduino driver)
-- **SimpleIni.h** (`SimpleIni.h`): INI file parsing (header-only)
-- **stb** (`stb/`): Image loading (stb_image.h)
+### Testing
+```bash
+# Run all tests
+ctest --test-dir build -C Release
 
-### Tools (`modules/tools/`)
-- `sunxds_models.json`: Model configuration metadata
-- `base64_encode.py`: Utility for model encoding
-- `rgb_565_convert.py`: Image format conversion
+# Run specific test
+./build/bin/unit_tests "[queue]"
 
-## Key Design Patterns
-
-### Factory Pattern
-`DetectorFactory` creates detector instances based on backend configuration:
-```cpp
-auto detector = DetectorFactory::create("dml", config);  // DirectML
-auto detector = DetectorFactory::create("tensorrt", config);  // TensorRT
+# Benchmark with golden dataset
+./build/bin/sunone-bench --model assets/models/sunxds_0.7.3.onnx --dataset test_data/frames.bin
 ```
 
-### Interface Segregation
-Each subsystem exposes a clean interface (`IDetector`, `IMouseDriver`, etc.), allowing:
-- Easy mocking for unit tests
-- Runtime backend switching
-- Minimal coupling between modules
+### Development
+```bash
+# Generate CLAUDE.md (if starting fresh)
+claude-code /init
 
-### Configuration Management
-Centralized configuration through `AppConfig` with per-game profiles:
-- `AppConfig.detector`: Detection settings (thresholds, backend)
-- `AppConfig.trajectory`: Mouse movement parameters
-- `AppConfig.currentGame`: Active game profile
+# Format code (if clang-format configured)
+cmake --build build --target format
 
-### Two-Phase Initialization
-Detectors support graceful error handling:
+# Analyze code
+cmake --build build --target analyze
+```
+
+---
+
+## 🎨 Code Conventions
+
+### Naming
+- **Classes/Structs:** PascalCase (`DMLDetector`, `TargetDatabase`)
+- **Functions/Methods:** camelCase (`captureFrame()`, `loadModel()`)
+- **Variables:** camelCase (`frameCount`, `detectionResults`)
+- **Constants:** UPPER_SNAKE_CASE (`MAX_TARGETS`, `DEFAULT_FOV`)
+- **Interfaces:** Prefix with `I` (`IDetector`, `IScreenCapture`)
+
+### File Organization
+- **Headers:** `src/<module>/<class>.h`
+- **Implementation:** `src/<module>/<class>.cpp`
+- **One class per file** (except small helper structs)
+
+### Memory Management
+- **GPU resources:** Reference-counted via TexturePool + RAII custom deleters
+- **CPU memory:** Pre-allocated object pools (NO allocations in hot path)
+- **Data structures:** Structure-of-Arrays (SoA) for cache efficiency
+
+### Threading
+- **Synchronization:** Lock-free atomics ONLY (no mutexes in loops)
+- **Queues:** `LatestFrameQueue<T>` with head-drop policy
+- **Ownership:** Each thread owns its data (message passing, no shared state)
+
+---
+
+## 🧪 Testing Requirements
+
+### Unit Tests (Catch2)
 ```cpp
-auto error = detector->loadModel(modelPath);
-if (!error.isReady()) {
-    // Handle initialization failure with error.errorMessage
+TEST_CASE("LatestFrameQueue head-drop policy", "[threading]") {
+    LatestFrameQueue<TestItem> queue;
+    queue.push(new TestItem(1));
+    queue.push(new TestItem(2));
+    queue.push(new TestItem(3));
+
+    auto* item = queue.pop();
+    REQUIRE(item->value == 3);  // Only latest returned
+    delete item;
 }
 ```
 
-## Development Workflow
+**Coverage targets:**
+- Algorithms: 100% (Kalman, NMS, Bezier)
+- Utilities: 80%
+- Interfaces: Compile-time only
 
-### Adding a New Detection Backend
-1. Create new class in `extracted_modules/detection/<backend>/`
-2. Implement `IDetector` interface
-3. Register in `DetectorFactory::create()`
-4. Update `AppConfig.detectorBackend` enum
+### Integration Tests
+- Use `FakeScreenCapture` with recorded frames
+- Golden dataset: `test_data/valorant_500frames.bin`
+- Validate end-to-end latency < 10ms
 
-### Adding a New Mouse Driver
-1. Create new class in `extracted_modules/input/drivers/`
-2. Implement `IMouseDriver` interface
-3. Update driver creation logic based on `MouseDriverType` enum
+---
 
-### Adding a New Capture Method
-1. Create new class in `extracted_modules/capture/`
-2. Implement `IScreenCapture` interface
-3. Update capture creation logic based on `AppConfig.captureMethod`
+## 🛠️ Development Workflow
 
-## Important Implementation Details
+### Adding a New Component
 
-### Threading Model
-- **Capture Thread**: Grabs frames at target FPS
-- **Detection Thread**: Runs AI inference asynchronously
-- **Movement Thread**: Applies mouse movements with trajectory smoothing
-- Communication via `ThreadSafeQueue<T>`
+1. **Define interface** in `extracted_modules/core/interfaces/`
+2. **Implement** in `extracted_modules/<module>/<component>/`
+3. **Register** in `ComponentFactory`
+4. **Write tests** in `tests/unit/`
+5. **Verify performance** against targets
 
-### Coordinate Systems
-- **Screen Space**: Absolute pixel coordinates (0,0 = top-left)
-- **Detection Space**: Model input resolution (e.g., 640x640 YOLO)
-- **Game Space**: Relative to detection region center
-- Use `AppConfig.detector.detectionResolution` for scaling
+**Example:**
+```cpp
+// 1. Interface
+class IDetector {
+    virtual std::vector<Detection> detect(Frame* frame) = 0;
+};
 
-### Performance Considerations
-- DirectML backend: ~30-60 FPS on modern integrated GPUs
-- TensorRT backend: 100+ FPS on RTX 30-series and newer
-- Capture overhead: ~1-2ms with Desktop Duplication
-- Target: 144 FPS total pipeline (7ms per frame)
+// 2. Implementation
+class MyDetector : public IDetector { /* ... */ };
 
-### Model Format
-- **DirectML**: ONNX models (`.onnx`)
-- **TensorRT**: Engine files (`.engine`) - platform-specific, must be rebuilt per GPU
-- Model export tools in `modules/tools/`
+// 3. Register
+factory.registerImplementation<IDetector>("MyBackend",
+    []() { return std::make_unique<MyDetector>(); });
 
-## Common Tasks
+// 4. Test
+TEST_CASE("MyDetector loads model") { /* ... */ }
+```
 
-### Testing a New YOLO Model
-1. Place `.onnx` file in `models/` directory
-2. Update `modelPath` in configuration
-3. Ensure input size matches model (e.g., 640x640)
-4. Adjust `numClasses` in `DetectorConfig`
+---
 
-### Debugging Detection Issues
-1. Enable `AppConfig.debugMode = true`
-2. Enable `AppConfig.detector.verboseLogging = true`
-3. Check `DetectorStats` for performance bottlenecks:
-   - `preProcessTimeMs`: Image preprocessing
-   - `inferenceTimeMs`: Model execution
-   - `postProcessTimeMs`: NMS and filtering
+## 📊 Performance Budgets
 
-### Profiling Mouse Movement
-1. Adjust `TrajectoryConfig` parameters:
-   - `smoothness`: Higher = slower, smoother movement
-   - `minSpeed` / `maxSpeed`: Movement velocity limits
-   - `oneEuroFilterBeta`: Responsiveness vs stability
-2. Use `BezierCurve` for natural, curved trajectories
+| Stage | Target | P95 | Failure Indicator |
+|-------|--------|-----|------------------|
+| Capture | <1ms | 2ms | GPU busy, driver lag |
+| Inference | 5-8ms | 10ms | Model too large |
+| NMS | <1ms | 2ms | >100 detections |
+| Tracking | <1ms | 2ms | >64 targets |
+| Input | <0.5ms | 1ms | Filter complexity |
+| **TOTAL** | **<10ms** | **15ms** | Any stage over target |
 
-## Project Structure Philosophy
+**Resource limits:**
+- VRAM: <512MB (model + buffers)
+- RAM: <1GB (working set)
+- CPU: <15% per thread (8-core CPU)
 
-This codebase prioritizes:
-- **Modularity**: Each component is independent and testable
-- **Modern C++**: Leveraging C++17 features (smart pointers, structured bindings, std::optional)
-- **Readability**: Clear naming, interfaces over inheritance, minimal macros
-- **Extensibility**: Easy to add new backends, drivers, or capture methods
+---
 
+## 🔗 Key Patterns
+
+### Factory Pattern
+```cpp
+// Runtime backend selection
+auto detector = factory.create<IDetector>(config.backend);
+auto driver = factory.create<IMouseDriver>(config.driver);
+```
+
+### Data-Oriented Design (SoA)
+```cpp
+// Cache-efficient parallel arrays
+struct TargetDatabase {
+    std::array<Vec2, 64> positions;
+    std::array<Vec2, 64> velocities;
+    std::array<float, 64> confidences;
+    // Iterate positions only → 2-3x faster
+};
+```
+
+### Two-Phase Initialization
+```cpp
+auto detector = factory.create<IDetector>("DirectML");
+if (!detector->loadModel(path)) {
+    LOG_ERROR("Failed: {}", detector->getLastError());
+}
+```
+
+---
+
+## 📖 Additional Resources
+
+- [Anthropic Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+- [Real-Time CV Inference Latency](https://blog.roboflow.com/inference-latency/)
+- [Lock-Free Queue Performance](https://moodycamel.com/blog/2013/a-fast-lock-free-queue-for-c++)
+- [1 Euro Filter (smoothing)](https://cristal.univ-lille.fr/~casiez/1euro/)
+- [Kalman Filter Tutorial](https://www.cs.unc.edu/~welch/kalman/)
+
+---
+
+**Current Phase:** Phase 1 - Foundation (see @docs/plans/2025-12-29-phase1-foundation.md)
+**Status:** ✅ CMake configured, interfaces defined, LatestFrameQueue implemented
+**Next:** Thread manager, logging system, unit tests
+
+---
+
+*Last updated: 2025-12-30 | Version: 2.1 (Concise)*
