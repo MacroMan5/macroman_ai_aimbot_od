@@ -18,9 +18,11 @@
 7. [Configuration & Plugin System](#configuration--plugin-system)
 8. [Testing & Observability](#testing--observability)
 9. [Performance Targets](#performance-targets)
-10. [MVP Scope & Future Expansion](#mvp-scope--future-expansion)
-11. [Implementation Roadmap](#implementation-roadmap)
-12. [Appendix](#appendix)
+10. [Safety & Humanization](#safety--humanization)
+11. [Critical Risks & Roadblocks](#critical-risks--roadblocks)
+12. [MVP Scope & Future Expansion](#mvp-scope--future-expansion)
+13. [Implementation Roadmap](#implementation-roadmap)
+14. [Appendix](#appendix)
 
 ---
 
@@ -1031,6 +1033,548 @@ LOG_ERROR("Failed to initialize capture: {}", error);
 - Use CUDA streams for async execution
 - Lower thread priority when game is active
 - Monitor GPU usage via NVML/DirectX queries
+
+---
+
+## Safety & Humanization
+
+**Philosophy:** *"Don't be invisible; be indistinguishable from a human."*
+
+This section covers anti-cheat mitigation strategies focused on **behavioral humanization** rather than technical evasion. The goal is to mathematically model human motor control imperfections.
+
+### 1. Behavioral Humanization (The "Turing Test" for Aim)
+
+**Objective:** Make aim assistance indistinguishable from skilled human play through natural imperfections.
+
+#### Reaction Time Emulation
+
+**Problem:** Humans cannot react instantly to visual stimuli (~150-250ms for trained gamers).
+
+**Implementation:**
+```cpp
+class ReactionDelayManager {
+    std::mt19937 rng;
+    std::normal_distribution<float> reactionDist{160.0f, 25.0f};  // μ=160ms, σ=25ms
+
+public:
+    float getReactionDelay() {
+        return std::clamp(reactionDist(rng), 100.0f, 300.0f);  // Bounded to human range
+    }
+};
+
+// In Tracking Thread:
+void update(const DetectionBatch& batch) {
+    auto detectionTime = batch.timestamp;
+    float reactionDelay = reactionDelayManager.getReactionDelay();
+
+    // Buffer detection until reaction time has elapsed
+    if (now() - detectionTime < reactionDelay) {
+        return;  // Don't react yet
+    }
+
+    // Proceed with tracking...
+}
+```
+
+**Trade-off:** Intentionally adds 100-300ms latency for safety. This is acceptable for educational use.
+
+#### Micro-Jitter & Tremor
+
+**Problem:** Human hands exhibit natural tremor (8-12 Hz physiological frequency).
+
+**Implementation:**
+```cpp
+class HumanTremorSimulator {
+    float phase{0.0f};
+    static constexpr float TREMOR_FREQ = 10.0f;  // Hz
+    static constexpr float TREMOR_AMPLITUDE = 0.5f;  // pixels
+
+public:
+    Vec2 applyTremor(Vec2 movement, float dt) {
+        phase += TREMOR_FREQ * dt * 2.0f * M_PI;
+
+        float jitterX = TREMOR_AMPLITUDE * std::sin(phase);
+        float jitterY = TREMOR_AMPLITUDE * std::sin(phase * 1.3f);  // Different frequency
+
+        return {movement.x + jitterX, movement.y + jitterY};
+    }
+};
+```
+
+**Alternative:** Use Perlin noise for more organic, low-frequency drift:
+```cpp
+Vec2 applyPerlinNoise(Vec2 movement, float time) {
+    float noiseX = perlin2D(time * 0.5f, 0.0f) * 2.0f;
+    float noiseY = perlin2D(0.0f, time * 0.5f) * 2.0f;
+    return {movement.x + noiseX, movement.y + noiseY};
+}
+```
+
+#### Overshoot & Correction
+
+**Problem:** Humans often flick past the target and micro-correct back (especially in flick shots).
+
+**Implementation:**
+```cpp
+class TrajectoryPlanner {
+    bool enableOvershoot{true};
+    float overshootFactor{0.15f};  // 15% overshoot
+
+public:
+    BezierCurve planCurve(Vec2 start, Vec2 target) {
+        Vec2 direction = (target - start).normalized();
+        Vec2 overshootTarget = target + direction * overshootFactor * (target - start).length();
+
+        // Create curve that goes slightly past target, then settles
+        BezierCurve curve;
+        curve.p0 = start;
+        curve.p1 = lerp(start, overshootTarget, 0.3f);  // Control point 1
+        curve.p2 = lerp(start, overshootTarget, 0.7f);  // Control point 2
+        curve.p3 = overshootTarget;
+
+        return curve;
+    }
+
+    Vec2 step(float t) {
+        if (t < 0.9f) {
+            return curve.evaluate(t);  // Approach with overshoot
+        } else {
+            // Final 10%: settle back to actual target with micro-corrections
+            return lerp(curve.evaluate(t), actualTarget, (t - 0.9f) / 0.1f);
+        }
+    }
+};
+```
+
+**Rationale:** Professional players exhibit 5-20% overshoot on flick shots, followed by sub-50ms corrections.
+
+---
+
+### 2. Overlay Privacy (Screenshot Protection)
+
+**Problem:** Games/anti-cheat systems capture screenshots via BitBlt/PrintWindow APIs to detect overlays.
+
+**Solution: Windows Display Affinity**
+
+```cpp
+void setupOverlayWindow(HWND hwnd) {
+    // Make overlay invisible to screen capture software
+    SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+
+    // Overlay remains visible to user but appears transparent/black in:
+    // - OBS recordings
+    // - Discord screen share
+    // - Anti-cheat screenshots
+    // - Windows.Graphics.Capture API
+}
+```
+
+**Compatibility:** Windows 10 1903+ (same requirement as WinRT capture).
+
+**Limitations:**
+- DirectX overlays (not window-based) may still be detectable
+- Kernel-mode screen capture can bypass this
+- Use in combination with transparent, frameless window design
+
+---
+
+### 3. Static Signature Mitigation
+
+**Problem:** Executables contain constant strings (e.g., "Aimbot", "Target") in the `.data` section that are easily searchable.
+
+#### String Encryption (Compile-Time)
+
+**Implementation using constexpr XOR:**
+```cpp
+// Compile-time string encryption (constexpr XOR)
+template<size_t N>
+struct EncryptedString {
+    char data[N];
+
+    constexpr EncryptedString(const char (&str)[N]) : data{} {
+        for (size_t i = 0; i < N; ++i) {
+            data[i] = str[i] ^ 0xAB;  // XOR key (change per build)
+        }
+    }
+
+    std::string decrypt() const {
+        std::string result(N - 1, '\0');
+        for (size_t i = 0; i < N - 1; ++i) {
+            result[i] = data[i] ^ 0xAB;
+        }
+        return result;
+    }
+};
+
+#define ENCRYPT_STRING(str) (EncryptedString(str).decrypt())
+
+// Usage:
+LOG_INFO(ENCRYPT_STRING("Aimbot initialized"));  // String not visible in binary
+```
+
+**Library Alternative:** Use [skCrypter](https://github.com/skadro-official/skCrypter) for production-grade obfuscation.
+
+**Strings to Encrypt:**
+- "Aimbot", "Target", "Detection", "Overlay"
+- Window class names
+- IPC channel names (SharedMemoryName, PipeName)
+- Model file paths
+
+#### Polymorphic Build IDs
+
+**Problem:** Static build signatures (GUID, timestamps) allow fingerprinting.
+
+**Implementation:**
+```cmake
+# CMakeLists.txt - Generate random build ID per compilation
+string(TIMESTAMP BUILD_TIME "%Y%m%d_%H%M%S")
+string(RANDOM LENGTH 16 ALPHABET "0123456789abcdef" BUILD_GUID)
+
+configure_file(
+    "${CMAKE_SOURCE_DIR}/src/BuildInfo.h.in"
+    "${CMAKE_BINARY_DIR}/generated/BuildInfo.h"
+)
+
+add_definitions(-DBUILD_GUID="${BUILD_GUID}")
+```
+
+**Effect:** Each build has a unique signature, preventing hash-based detection.
+
+---
+
+### 4. Memory Pattern Evasion (Post-MVP)
+
+**Out of MVP scope** but architectured for future implementation:
+
+```cpp
+// Memory layout randomization
+class MemoryLayoutRandomizer {
+    // Allocate critical structures (TargetDatabase, SharedConfig)
+    // at random offsets within a larger reserved region
+    void* allocateRandomized(size_t size) {
+        static std::mt19937 rng(std::random_device{}());
+        size_t offset = std::uniform_int_distribution<size_t>(0, 1024 * 1024)(rng);
+        return VirtualAlloc(nullptr, size + offset, MEM_COMMIT, PAGE_READWRITE) + offset;
+    }
+};
+```
+
+**Rationale:** Prevents signature scanning for known data structures.
+
+---
+
+### 5. Input Timing Variance
+
+**Problem:** Perfectly consistent 1000Hz input is superhuman and detectable.
+
+**Implementation:**
+```cpp
+// In Input Thread:
+void inputLoop() {
+    std::mt19937 rng;
+    std::uniform_real_distribution<float> jitterDist(0.8f, 1.2f);  // ±20% jitter
+
+    while (running) {
+        float sleepTime = 1.0f / 1000.0f;  // 1ms baseline
+        sleepTime *= jitterDist(rng);  // Add variance: 0.8ms - 1.2ms
+
+        // Process input...
+
+        std::this_thread::sleep_for(std::chrono::duration<float>(sleepTime));
+    }
+}
+```
+
+**Result:** Input rate varies naturally between 800-1200 Hz instead of perfect 1000 Hz.
+
+---
+
+### Safety Summary
+
+| Technique | Purpose | MVP Status |
+|-----------|---------|------------|
+| **Reaction Delay** | Simulate human reaction time (100-300ms) | ✅ Implement in Phase 4 |
+| **Micro-Tremor** | Add physiological hand tremor (8-12 Hz) | ✅ Implement in Phase 4 |
+| **Overshoot/Correction** | Mimic flick shot imperfections | ✅ Implement in Phase 4 |
+| **Overlay Affinity** | Hide overlay from screen capture | ✅ Implement in Phase 6 |
+| **String Encryption** | Obfuscate binary strings | ✅ Implement in Phase 1 |
+| **Input Variance** | Randomize update timing | ✅ Implement in Phase 4 |
+| **Memory Randomization** | Evade pattern scanning | 🔲 Post-MVP |
+
+**Educational Note:** These techniques are included for **educational purposes** to understand anti-cheat systems. Use responsibly and only in authorized testing environments.
+
+---
+
+## Critical Risks & Roadblocks
+
+**These are potential implementation traps that could break the system despite good design. Address these during implementation.**
+
+### 1. The "Leak on Drop" Trap
+
+**Location:** `LatestFrameQueue::push()`
+
+**Problem:**
+```cpp
+void push(T* new_frame) {
+    T* old = slot.exchange(new_frame, std::memory_order_release);
+    if (old) delete old;  // ⚠️ DANGER
+}
+```
+
+**Risk:** If `T` is `Frame`, and `Frame` holds a `Texture*` from the pool, `delete old` must decrement the texture's ref-count. If the logic is just "delete the pointer" without notifying the pool, your **Texture Pool will starve** (all textures marked as 'busy') within 3 frames, and the Capture thread will hang or drop everything.
+
+**Fix: RAII Wrappers with Custom Deleters**
+```cpp
+struct TextureDeleter {
+    TexturePool* pool;
+
+    void operator()(Texture* tex) const {
+        if (pool && tex) {
+            pool->release(tex);
+        }
+    }
+};
+
+struct Frame {
+    std::unique_ptr<Texture, TextureDeleter> texture;
+    std::chrono::high_resolution_clock::time_point captureTime;
+    uint64_t frameSequence;
+
+    Frame(Texture* tex, TexturePool* pool)
+        : texture(tex, TextureDeleter{pool}) {}
+};
+
+// Now LatestFrameQueue::push() automatically releases texture on delete
+void push(std::unique_ptr<Frame> new_frame) {
+    auto* old = slot.exchange(new_frame.release(), std::memory_order_release);
+    if (old) delete old;  // ✅ SAFE - Frame destructor calls pool->release()
+}
+```
+
+**Validation:**
+- Add assertion: `ASSERT(texturePool.getAvailableCount() > 0)` in Capture thread
+- Monitor metric: `metrics.texturePoolStarved` (should always be 0)
+
+---
+
+### 2. Input Extrapolation Overshoot
+
+**Location:** Input Thread prediction logic
+
+**Problem:**
+```cpp
+// Dangerous extrapolation
+Vec2 predictedPos = target.position + target.velocity * (now - target.observedAt).count();
+```
+
+**Risk:** If the Detection thread stutters (e.g., Windows decides to scan for viruses, GPU driver update), `now - observedAt` can become **100ms or more**:
+- Target predicted off-screen
+- Mouse snaps violently to screen edge
+- Detection by anti-cheat (inhuman snap speed)
+
+**Fix: Prediction Clamping**
+```cpp
+float dt = std::chrono::duration<float>(now - target.observedAt).count();
+dt = std::min(dt, 0.050f);  // ✅ Cap prediction at 50ms
+
+if (dt > 0.050f) {
+    // Data is too stale (>50ms old) - decay confidence
+    cmd.confidence *= 0.5f;
+
+    if (cmd.confidence < 0.3f) {
+        cmd.hasTarget = false;  // Stop aiming
+        return;
+    }
+}
+
+Vec2 predictedPos = target.position + target.velocity * dt;  // Safe extrapolation
+```
+
+**Rationale:** 50ms is the maximum reasonable prediction horizon. Beyond that, data is stale and predictions are unreliable.
+
+**Telemetry:**
+- Track `metrics.stalePredictionEvents` (count of >50ms dt)
+- Alert if stalePredictionEvents > 10/minute (indicates Detection thread issues)
+
+---
+
+### 3. Shared Memory Atomics (Platform Specifics)
+
+**Location:** `SharedConfig` structure
+
+**Problem:** C++ `std::atomic` is **not strictly guaranteed** to be lock-free across different processes (Config UI vs Engine), though on Windows x64 it almost always is.
+
+**Risk:** If atomics use locks internally, deadlock is possible if one process crashes while holding the lock.
+
+**Fix: Verify Lock-Free + Alignment**
+```cpp
+struct SharedConfig {
+    alignas(64) std::atomic<float> aimSmoothness{0.5f};
+    alignas(64) std::atomic<float> fov{60.0f};
+    alignas(64) std::atomic<uint32_t> activeProfileId{0};
+    alignas(64) std::atomic<bool> enablePrediction{true};
+
+    // Static assert: Ensure lock-free on this platform
+    static_assert(decltype(aimSmoothness)::is_always_lock_free,
+                  "std::atomic<float> must be lock-free for IPC safety");
+    static_assert(decltype(fov)::is_always_lock_free);
+    static_assert(decltype(activeProfileId)::is_always_lock_free);
+    static_assert(decltype(enablePrediction)::is_always_lock_free);
+
+    // Ensure both processes compile with same alignment
+    static_assert(alignof(SharedConfig) == 64, "Alignment mismatch");
+};
+```
+
+**Validation:**
+- Compile-time check (static_assert fails if not lock-free)
+- Runtime check: Log `atomic_is_lock_free()` at startup for each field
+
+**Platform Note:** On x64 Windows, `atomic<T>` is lock-free for T ≤ 8 bytes. This covers float, int, bool, pointers.
+
+---
+
+### 4. Deadman Switch (Safety)
+
+**Problem:** If the Capture thread crashes but the Input thread keeps running, the aimbot might get stuck:
+- Tracking a "ghost" target (stale data)
+- Pulling down continuously (recoil control with no stop condition)
+- Moving erratically
+
+**Fix: Input Thread Timeout**
+```cpp
+void inputLoop() {
+    auto lastCommandTime = high_resolution_clock::now();
+
+    while (running) {
+        AimCommand cmd = latestCommand.load();
+        auto now = high_resolution_clock::now();
+
+        // ✅ Deadman switch: Stop input if no new commands for 200ms
+        if (now - lastCommandTime > 200ms) {
+            LOG_WARN("Input stale (no commands for 200ms) - stopping");
+            cmd.hasTarget = false;
+            // Optionally: Trigger emergency shutdown
+        }
+
+        if (cmd.hasTarget) {
+            lastCommandTime = now;  // Update timestamp
+            // Process input...
+        }
+
+        sleep_for(1ms);
+    }
+}
+```
+
+**Telemetry:**
+- `metrics.deadmanSwitchTriggered` (count)
+- If triggered, investigate Detection/Tracking thread health
+
+---
+
+### 5. Thread Affinity (Jitter Reduction)
+
+**Problem:** Windows scheduler bounces threads between cores, causing cache misses and latency spikes.
+
+**Fix: Pin Threads to Specific Cores**
+```cpp
+class ThreadManager {
+    void setCoreAffinity(std::thread& thread, int coreId) {
+        HANDLE handle = thread.native_handle();
+        DWORD_PTR mask = 1ULL << coreId;
+        SetThreadAffinityMask(handle, mask);
+    }
+
+public:
+    void initializeThreads() {
+        // Avoid Core 0 (OS interrupts)
+        setCoreAffinity(captureThread, 1);   // Core 1
+        setCoreAffinity(detectionThread, 2); // Core 2
+        setCoreAffinity(trackingThread, 3);  // Core 3
+        setCoreAffinity(inputThread, 4);     // Core 4
+
+        LOG_INFO("Thread affinity set: Capture=C1, Detection=C2, Tracking=C3, Input=C4");
+    }
+};
+```
+
+**Benefit:** Reduces context-switch latency by ~20-30% in micro-benchmarks.
+
+**Caution:** Only beneficial on CPUs with 6+ cores. On 4-core systems, let the scheduler handle it.
+
+---
+
+### 6. Detection Batch Allocation
+
+**Problem:** `ObjectPool<DetectionBatch>` recycles the batch object, but `DetectionBatch` contains `std::vector<Detection>` which allocates its internal buffer on the heap.
+
+**Issue:**
+```cpp
+struct DetectionBatch {
+    std::vector<Detection> observations;  // ⚠️ Allocates on heap
+    std::chrono::time_point timestamp;
+};
+
+// Recycling the batch doesn't recycle the vector's buffer
+pool.release(batch);  // batch object recycled, but vector buffer not reused
+```
+
+**Fix: Fixed-Capacity Vector**
+```cpp
+template<typename T, size_t Capacity>
+class FixedCapacityVector {
+    std::array<T, Capacity> data;
+    size_t count{0};
+
+public:
+    void push_back(const T& item) {
+        ASSERT(count < Capacity);
+        data[count++] = item;
+    }
+
+    T& operator[](size_t i) { return data[i]; }
+    size_t size() const { return count; }
+    void clear() { count = 0; }
+
+    // No heap allocation
+};
+
+struct DetectionBatch {
+    FixedCapacityVector<Detection, 64> observations;  // ✅ Pre-allocated, max 64 targets
+    std::chrono::time_point timestamp;
+};
+```
+
+**Benefit:** Zero allocations in hot path, better cache locality.
+
+**Validation:** Profile with Tracy/VTune - should show **zero malloc/free calls** in Detection→Tracking path.
+
+---
+
+### Risk Mitigation Checklist
+
+**Phase 1 (Foundation):**
+- [ ] Static assert atomic lock-free in SharedConfig
+- [ ] String encryption for sensitive constants
+- [ ] Thread affinity configuration (optional, based on core count)
+
+**Phase 2 (Capture & Detection):**
+- [ ] RAII wrappers for Texture with custom deleter
+- [ ] TexturePool starvation assertions
+- [ ] FixedCapacityVector for DetectionBatch
+
+**Phase 4 (Input & Aiming):**
+- [ ] Prediction clamping (max 50ms extrapolation)
+- [ ] Deadman switch (200ms timeout)
+- [ ] Input timing variance
+
+**Phase 6 (UI):**
+- [ ] SetWindowDisplayAffinity for overlay
+
+**Phase 9 (Documentation):**
+- [ ] Document all safety mechanisms
+- [ ] Provide configuration examples
 
 ---
 
