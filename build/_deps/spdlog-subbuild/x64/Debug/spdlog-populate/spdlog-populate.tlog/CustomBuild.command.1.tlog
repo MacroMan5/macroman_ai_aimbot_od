@@ -1,0 +1,150 @@
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-MKDIR.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/tmp/spdlog-populate-mkdirs.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-DOWNLOAD.RULE
+setlocal
+cd C:\Users\therouxe\source\repos\marcoman_ai_aimbot\.worktrees\feature-phase3-tracking\build\_deps
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/tmp/spdlog-populate-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-UPDATE.RULE
+setlocal
+cd C:\Users\therouxe\source\repos\marcoman_ai_aimbot\.worktrees\feature-phase3-tracking\build\_deps\spdlog-src
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/tmp/spdlog-populate-gitupdate.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-PATCH.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-CONFIGURE.RULE
+setlocal
+cd C:\Users\therouxe\source\repos\marcoman_ai_aimbot\.worktrees\feature-phase3-tracking\build\_deps\spdlog-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-BUILD.RULE
+setlocal
+cd C:\Users\therouxe\source\repos\marcoman_ai_aimbot\.worktrees\feature-phase3-tracking\build\_deps\spdlog-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-INSTALL.RULE
+setlocal
+cd C:\Users\therouxe\source\repos\marcoman_ai_aimbot\.worktrees\feature-phase3-tracking\build\_deps\spdlog-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\E07C556772E7A4C1B2AE664B53CC7252\SPDLOG-POPULATE-TEST.RULE
+setlocal
+cd C:\Users\therouxe\source\repos\marcoman_ai_aimbot\.worktrees\feature-phase3-tracking\build\_deps\spdlog-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-test
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\AFF1633FC0DE43CC608AB90BEAD76401\SPDLOG-POPULATE-COMPLETE.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E make_directory C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/CMakeFiles/Debug/spdlog-populate-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E touch C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/spdlog-populate-prefix/src/spdlog-populate-stamp/Debug/spdlog-populate-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKEFILES\B3FEAE63C8779926AFAC586A21D08BE5\SPDLOG-POPULATE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\SPDLOG-SUBBUILD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild -BC:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild --check-stamp-file C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/spdlog-subbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

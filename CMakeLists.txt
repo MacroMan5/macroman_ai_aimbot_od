@@ -43,13 +43,20 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(Catch2)
 endif()
 
-# 3. Eigen (Math)
+# 3. Eigen (Math) - Disable Eigen's tests (we only need the library)
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_DOC OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_PKGCONFIG OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_BLAS OFF CACHE BOOL "" FORCE)
+set(EIGEN_BUILD_LAPACK OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
   Eigen
   GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
   GIT_TAG 3.4.0
 )
 FetchContent_MakeAvailable(Eigen)
+set(BUILD_TESTING ON CACHE BOOL "" FORCE)  # Re-enable for our tests
 
 # 4. OpenCV (Optional - minimal usage in Phase 2)
 if(NOT OpenCV_DIR)

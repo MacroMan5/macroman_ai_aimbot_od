@@ -2,7 +2,8 @@
 add_subdirectory(core)
 add_subdirectory(capture)
 add_subdirectory(detection)
-# Input, tracking, config, ui will be added as Phase 3+ progresses
+add_subdirectory(tracking)
+# Input, config, ui will be added as Phase 3+ progresses
 
 # Main Executable (minimal Phase 2 version)
 add_executable(macroman_aimbot main.cpp)

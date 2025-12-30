@@ -1,110 +1,51 @@
 #pragma once
 
-#include "core/interfaces/ITargetPredictor.h"
-#include <opencv2/video/tracking.hpp>
-#include <chrono>
-#include <deque>
+#include <Eigen/Dense>
+#include "core/entities/MathTypes.h"
+#include "core/entities/KalmanState.h"
 
 namespace macroman {
 
 /**
- * @class KalmanPredictor
- * @brief Uses a linear Kalman Filter to predict target movement.
+ * @brief Stateless Kalman filter for target prediction
  *
- * Implements a Constant Velocity (CV) model to smooth tracking data and predict
- * future positions. This is effective for targets moving in relatively straight lines
- * or smooth curves.
- *
- * State Vector (4 dimensions):
- * [0] x: Position X
- * [1] y: Position Y
- * [2] vx: Velocity X
- * [3] vy: Velocity Y
- *
- * Measurement Vector (2 dimensions):
- * [0] x: Measured Position X
- * [1] y: Measured Position Y
+ * This implementation is stateless to support SoA architectures.
+ * It takes a reference to a KalmanState POD which stores the
+ * state vector and covariance matrix.
  */
-class KalmanPredictor : public ITargetPredictor {
+class KalmanPredictor {
 public:
-    KalmanPredictor();
-    ~KalmanPredictor() override = default;
+    KalmanPredictor(float processNoise = 10.0f, float measurementNoise = 0.01f);
 
     /**
-     * @brief Updates the filter with a new observation.
-     *
-     * @param position The center point of the detected target (screen coordinates).
-     * @param timestamp The time the frame was captured (currently unused for dt, assumes ~60fps).
+     * @brief Update state with a new observation
+     * @param observation Measured position [x, y]
+     * @param dt Time since last update
+     * @param state State POD to update (stored in TargetDatabase)
      */
-    void update(const cv::Point2f& position,
-               std::chrono::steady_clock::time_point timestamp) override;
+    void update(Vec2 observation, float dt, KalmanState& state) const noexcept;
 
     /**
-     * @brief Predicts the target's position at a future time.
-     *
-     * Uses the current state estimate and velocity to project the position forward.
-     *
-     * Formula:
-     * x_future = x_current + (vx * dt)
-     * y_future = y_current + (vy * dt)
-     *
-     * @param ahead The time duration to predict into the future.
-     * @return PredictedPosition containing the (x,y) and a confidence score [0.0 - 1.0].
-     *         Confidence is based on the number of stable updates and the prediction distance.
+     * @brief Advance state without a new observation (coasting)
+     * @param dt Time to advance
+     * @param state State POD to update
      */
-    PredictedPosition predict(std::chrono::milliseconds ahead) const override;
+    void predictState(float dt, KalmanState& state) const noexcept;
 
     /**
-     * @brief Resets the filter state.
-     * Call this when a target is lost or a new target is selected to prevent
-     * "ghost" momentum from the previous track.
+     * @brief Predict position ahead in time without modifying state
+     * @param dt Time to predict ahead
+     * @param state Current state POD
      */
-    void reset() override;
-
-    std::string getName() const override { return "Kalman"; }
-    
-    /**
-     * @brief Checks if the filter has converged enough to be reliable.
-     * @return true if update count >= 3.
-     */
-    bool isStable() const override;
-
-    /**
-     * @brief Gets the current estimated velocity vector.
-     * @return (vx, vy) in pixels per time step.
-     */
-    cv::Point2f getVelocity() const;
-
-    /**
-     * @brief Sets the process noise covariance (Q).
-     * Higher values = filter trusts new measurements more (more jittery, faster response).
-     * Lower values = filter trusts the model more (smoother, slower response).
-     */
-    void setProcessNoise(float noise);
-
-    /**
-     * @brief Sets the measurement noise covariance (R).
-     * Represents the uncertainty in the detection bounding boxes.
-     */
-    void setMeasurementNoise(float noise);
+    [[nodiscard]] Vec2 predict(float dt, const KalmanState& state) const noexcept;
 
 private:
-    void initKalman();
+    float q_val_; // Process noise scaling
+    float r_val_; // Measurement noise scaling
 
-    cv::KalmanFilter kf_;
-    bool initialized_ = false;
-    int updateCount_ = 0;
-
-    // History for velocity calculation
-    struct Sample {
-        cv::Point2f position;
-        std::chrono::steady_clock::time_point timestamp;
-    };
-    std::deque<Sample> history_;
-    static constexpr size_t MAX_HISTORY = 10;
-
-    float processNoise_ = 1e-4f;
-    float measurementNoise_ = 1e-2f;
+    // Internal Eigen mapping helpers
+    static void toEigen(const KalmanState& state, Eigen::Vector4f& x, Eigen::Matrix4f& P) noexcept;
+    static void fromEigen(const Eigen::Vector4f& x, const Eigen::Matrix4f& P, KalmanState& state) noexcept;
 };
 
 } // namespace macroman

@@ -1,0 +1,732 @@
+Start testing: Dec 30 14:41 Eastern Standard Time
+----------------------------------------------------------
+1/36 Testing: LatestFrameQueue - Basic push/pop
+1/36 Test: LatestFrameQueue - Basic push/pop
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "LatestFrameQueue - Basic push/pop"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"LatestFrameQueue - Basic push/pop" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "LatestFrameQueue - Basic push/pop"
+Randomness seeded to: 1204315102
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"LatestFrameQueue - Basic push/pop" end time: Dec 30 14:41 Eastern Standard Time
+"LatestFrameQueue - Basic push/pop" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/36 Testing: LatestFrameQueue - Head-drop policy
+2/36 Test: LatestFrameQueue - Head-drop policy
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "LatestFrameQueue - Head-drop policy"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"LatestFrameQueue - Head-drop policy" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "LatestFrameQueue - Head-drop policy"
+Randomness seeded to: 1699695668
+===============================================================================
+All tests passed (6 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"LatestFrameQueue - Head-drop policy" end time: Dec 30 14:41 Eastern Standard Time
+"LatestFrameQueue - Head-drop policy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/36 Testing: LatestFrameQueue - Memory safety
+3/36 Test: LatestFrameQueue - Memory safety
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "LatestFrameQueue - Memory safety"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"LatestFrameQueue - Memory safety" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "LatestFrameQueue - Memory safety"
+Randomness seeded to: 496718163
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"LatestFrameQueue - Memory safety" end time: Dec 30 14:41 Eastern Standard Time
+"LatestFrameQueue - Memory safety" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/36 Testing: TexturePool - Basic Acquisition
+4/36 Test: TexturePool - Basic Acquisition
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TexturePool - Basic Acquisition"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TexturePool - Basic Acquisition" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+[14:41:36.282] [info] [thread 13328] Logging system initialized
+[14:41:36.282] [info] [thread 13328] TexturePool shut down
+[14:41:36.282] [info] [thread 13328] TexturePool shut down
+[14:41:36.282] [info] [thread 13328] TexturePool shut down
+Filters: "TexturePool - Basic Acquisition"
+Randomness seeded to: 1378485489
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"TexturePool - Basic Acquisition" end time: Dec 30 14:41 Eastern Standard Time
+"TexturePool - Basic Acquisition" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/36 Testing: TexturePool - Starvation Logic
+5/36 Test: TexturePool - Starvation Logic
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TexturePool - Starvation Logic"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TexturePool - Starvation Logic" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+[14:41:36.413] [info] [thread 22260] Logging system initialized
+[14:41:36.413] [warning] [thread 22260] TexturePool starved at frame 4 (all 3 textures busy)
+[14:41:36.414] [info] [thread 22260] TexturePool shut down
+Filters: "TexturePool - Starvation Logic"
+Randomness seeded to: 2986387676
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"TexturePool - Starvation Logic" end time: Dec 30 14:41 Eastern Standard Time
+"TexturePool - Starvation Logic" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/36 Testing: TexturePool - RAII Compliance (Trap 1)
+6/36 Test: TexturePool - RAII Compliance (Trap 1)
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TexturePool - RAII Compliance (Trap 1)"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TexturePool - RAII Compliance (Trap 1)" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+[14:41:36.481] [info] [thread 19420] Logging system initialized
+[14:41:36.481] [info] [thread 19420] TexturePool shut down
+Filters: "TexturePool - RAII Compliance (Trap 1)"
+Randomness seeded to: 1830946740
+===============================================================================
+All tests passed (4 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"TexturePool - RAII Compliance (Trap 1)" end time: Dec 30 14:41 Eastern Standard Time
+"TexturePool - RAII Compliance (Trap 1)" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/36 Testing: PostProcessor - NMS
+7/36 Test: PostProcessor - NMS
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "PostProcessor - NMS"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"PostProcessor - NMS" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "PostProcessor - NMS"
+Randomness seeded to: 2418869842
+===============================================================================
+All tests passed (4 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"PostProcessor - NMS" end time: Dec 30 14:41 Eastern Standard Time
+"PostProcessor - NMS" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/36 Testing: PostProcessor - Confidence Filtering
+8/36 Test: PostProcessor - Confidence Filtering
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "PostProcessor - Confidence Filtering"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"PostProcessor - Confidence Filtering" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "PostProcessor - Confidence Filtering"
+Randomness seeded to: 978239934
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"PostProcessor - Confidence Filtering" end time: Dec 30 14:41 Eastern Standard Time
+"PostProcessor - Confidence Filtering" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/36 Testing: PostProcessor - Hitbox Mapping
+9/36 Test: PostProcessor - Hitbox Mapping
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "PostProcessor - Hitbox Mapping"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"PostProcessor - Hitbox Mapping" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "PostProcessor - Hitbox Mapping"
+Randomness seeded to: 1686427393
+===============================================================================
+All tests passed (4 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"PostProcessor - Hitbox Mapping" end time: Dec 30 14:41 Eastern Standard Time
+"PostProcessor - Hitbox Mapping" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/36 Testing: Vec2 basic operations
+10/36 Test: Vec2 basic operations
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Vec2 basic operations"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Vec2 basic operations" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Vec2 basic operations"
+Randomness seeded to: 1507372209
+===============================================================================
+All tests passed (13 assertions in 1 test case)
+
+<end of output>
+Test time =   0.10 sec
+----------------------------------------------------------
+Test Passed.
+"Vec2 basic operations" end time: Dec 30 14:41 Eastern Standard Time
+"Vec2 basic operations" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/36 Testing: TargetID comparison
+11/36 Test: TargetID comparison
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetID comparison"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetID comparison" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetID comparison"
+Randomness seeded to: 2630146495
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"TargetID comparison" end time: Dec 30 14:41 Eastern Standard Time
+"TargetID comparison" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/36 Testing: DetectionBatch construction
+12/36 Test: DetectionBatch construction
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "DetectionBatch construction"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"DetectionBatch construction" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "DetectionBatch construction"
+Randomness seeded to: 755178397
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"DetectionBatch construction" end time: Dec 30 14:41 Eastern Standard Time
+"DetectionBatch construction" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/36 Testing: DetectionBatch add detections
+13/36 Test: DetectionBatch add detections
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "DetectionBatch add detections"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"DetectionBatch add detections" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "DetectionBatch add detections"
+Randomness seeded to: 1103862377
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"DetectionBatch add detections" end time: Dec 30 14:41 Eastern Standard Time
+"DetectionBatch add detections" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/36 Testing: DetectionBatch capacity limit
+14/36 Test: DetectionBatch capacity limit
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "DetectionBatch capacity limit"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"DetectionBatch capacity limit" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "DetectionBatch capacity limit"
+Randomness seeded to: 4075065492
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"DetectionBatch capacity limit" end time: Dec 30 14:41 Eastern Standard Time
+"DetectionBatch capacity limit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/36 Testing: TargetDatabase construction
+15/36 Test: TargetDatabase construction
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetDatabase construction"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetDatabase construction" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetDatabase construction"
+Randomness seeded to: 4254372651
+===============================================================================
+All tests passed (4 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"TargetDatabase construction" end time: Dec 30 14:41 Eastern Standard Time
+"TargetDatabase construction" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/36 Testing: TargetDatabase add target
+16/36 Test: TargetDatabase add target
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetDatabase add target"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetDatabase add target" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetDatabase add target"
+Randomness seeded to: 2196835343
+===============================================================================
+All tests passed (6 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"TargetDatabase add target" end time: Dec 30 14:41 Eastern Standard Time
+"TargetDatabase add target" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/36 Testing: TargetDatabase prediction update
+17/36 Test: TargetDatabase prediction update
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetDatabase prediction update"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetDatabase prediction update" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetDatabase prediction update"
+Randomness seeded to: 2197437875
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"TargetDatabase prediction update" end time: Dec 30 14:41 Eastern Standard Time
+"TargetDatabase prediction update" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/36 Testing: TargetDatabase remove target
+18/36 Test: TargetDatabase remove target
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetDatabase remove target"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetDatabase remove target" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetDatabase remove target"
+Randomness seeded to: 3051222901
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"TargetDatabase remove target" end time: Dec 30 14:41 Eastern Standard Time
+"TargetDatabase remove target" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/36 Testing: IoU calculation
+19/36 Test: IoU calculation
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "IoU calculation"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"IoU calculation" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "IoU calculation"
+Randomness seeded to: 2555330281
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"IoU calculation" end time: Dec 30 14:41 Eastern Standard Time
+"IoU calculation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/36 Testing: Data association greedy matching
+20/36 Test: Data association greedy matching
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Data association greedy matching"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Data association greedy matching" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Data association greedy matching"
+Randomness seeded to: 1067759101
+===============================================================================
+All tests passed (8 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"Data association greedy matching" end time: Dec 30 14:41 Eastern Standard Time
+"Data association greedy matching" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/36 Testing: Data association with lost targets
+21/36 Test: Data association with lost targets
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Data association with lost targets"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Data association with lost targets" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Data association with lost targets"
+Randomness seeded to: 2497392928
+===============================================================================
+All tests passed (4 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"Data association with lost targets" end time: Dec 30 14:41 Eastern Standard Time
+"Data association with lost targets" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/36 Testing: Kalman stateless update
+22/36 Test: Kalman stateless update
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Kalman stateless update"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Kalman stateless update" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Kalman stateless update"
+Randomness seeded to: 1217860872
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"Kalman stateless update" end time: Dec 30 14:41 Eastern Standard Time
+"Kalman stateless update" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/36 Testing: Kalman prediction with constant velocity
+23/36 Test: Kalman prediction with constant velocity
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Kalman prediction with constant velocity"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Kalman prediction with constant velocity" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Kalman prediction with constant velocity"
+Randomness seeded to: 1085797968
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"Kalman prediction with constant velocity" end time: Dec 30 14:41 Eastern Standard Time
+"Kalman prediction with constant velocity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/36 Testing: Target selection filters by FOV
+24/36 Test: Target selection filters by FOV
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Target selection filters by FOV"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Target selection filters by FOV" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Target selection filters by FOV"
+Randomness seeded to: 4059320198
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"Target selection filters by FOV" end time: Dec 30 14:41 Eastern Standard Time
+"Target selection filters by FOV" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/36 Testing: Target selection prioritizes hitbox type
+25/36 Test: Target selection prioritizes hitbox type
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Target selection prioritizes hitbox type"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Target selection prioritizes hitbox type" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Target selection prioritizes hitbox type"
+Randomness seeded to: 1961377678
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"Target selection prioritizes hitbox type" end time: Dec 30 14:41 Eastern Standard Time
+"Target selection prioritizes hitbox type" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/36 Testing: Target selection returns nullopt when no targets in FOV
+26/36 Test: Target selection returns nullopt when no targets in FOV
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Target selection returns nullopt when no targets in FOV"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Target selection returns nullopt when no targets in FOV" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Target selection returns nullopt when no targets in FOV"
+Randomness seeded to: 1761725092
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"Target selection returns nullopt when no targets in FOV" end time: Dec 30 14:41 Eastern Standard Time
+"Target selection returns nullopt when no targets in FOV" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/36 Testing: Target selection handles empty database
+27/36 Test: Target selection handles empty database
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "Target selection handles empty database"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"Target selection handles empty database" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "Target selection handles empty database"
+Randomness seeded to: 1180361806
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"Target selection handles empty database" end time: Dec 30 14:41 Eastern Standard Time
+"Target selection handles empty database" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/36 Testing: AimCommand default construction
+28/36 Test: AimCommand default construction
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "AimCommand default construction"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"AimCommand default construction" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "AimCommand default construction"
+Randomness seeded to: 3636834258
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.11 sec
+----------------------------------------------------------
+Test Passed.
+"AimCommand default construction" end time: Dec 30 14:41 Eastern Standard Time
+"AimCommand default construction" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/36 Testing: AimCommand with valid target
+29/36 Test: AimCommand with valid target
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "AimCommand with valid target"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"AimCommand with valid target" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "AimCommand with valid target"
+Randomness seeded to: 2615167801
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"AimCommand with valid target" end time: Dec 30 14:41 Eastern Standard Time
+"AimCommand with valid target" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/36 Testing: AimCommand copy semantics
+30/36 Test: AimCommand copy semantics
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "AimCommand copy semantics"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"AimCommand copy semantics" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "AimCommand copy semantics"
+Randomness seeded to: 4266760713
+===============================================================================
+All tests passed (5 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"AimCommand copy semantics" end time: Dec 30 14:41 Eastern Standard Time
+"AimCommand copy semantics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/36 Testing: TargetTracker initializes empty
+31/36 Test: TargetTracker initializes empty
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetTracker initializes empty"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetTracker initializes empty" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetTracker initializes empty"
+Randomness seeded to: 2393164160
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"TargetTracker initializes empty" end time: Dec 30 14:41 Eastern Standard Time
+"TargetTracker initializes empty" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/36 Testing: TargetTracker creates new track from detection
+32/36 Test: TargetTracker creates new track from detection
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetTracker creates new track from detection"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetTracker creates new track from detection" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetTracker creates new track from detection"
+Randomness seeded to: 2576762223
+===============================================================================
+All tests passed (3 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"TargetTracker creates new track from detection" end time: Dec 30 14:41 Eastern Standard Time
+"TargetTracker creates new track from detection" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/36 Testing: TargetTracker updates existing track
+33/36 Test: TargetTracker updates existing track
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetTracker updates existing track"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetTracker updates existing track" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetTracker updates existing track"
+Randomness seeded to: 2844727408
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"TargetTracker updates existing track" end time: Dec 30 14:41 Eastern Standard Time
+"TargetTracker updates existing track" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/36 Testing: TargetTracker maintains tracks during grace period
+34/36 Test: TargetTracker maintains tracks during grace period
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetTracker maintains tracks during grace period"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetTracker maintains tracks during grace period" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetTracker maintains tracks during grace period"
+Randomness seeded to: 1039846473
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"TargetTracker maintains tracks during grace period" end time: Dec 30 14:41 Eastern Standard Time
+"TargetTracker maintains tracks during grace period" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/36 Testing: TargetTracker removes stale tracks after grace period
+35/36 Test: TargetTracker removes stale tracks after grace period
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetTracker removes stale tracks after grace period"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetTracker removes stale tracks after grace period" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetTracker removes stale tracks after grace period"
+Randomness seeded to: 232607190
+===============================================================================
+All tests passed (1 assertion in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"TargetTracker removes stale tracks after grace period" end time: Dec 30 14:41 Eastern Standard Time
+"TargetTracker removes stale tracks after grace period" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/36 Testing: TargetTracker selects best target by FOV and hitbox
+36/36 Test: TargetTracker selects best target by FOV and hitbox
+Command: "C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/bin/Release/unit_tests.exe" "TargetTracker selects best target by FOV and hitbox"
+Directory: C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/tests/unit
+"TargetTracker selects best target by FOV and hitbox" start time: Dec 30 14:41 Eastern Standard Time
+Output:
+----------------------------------------------------------
+Filters: "TargetTracker selects best target by FOV and hitbox"
+Randomness seeded to: 3457370162
+===============================================================================
+All tests passed (2 assertions in 1 test case)
+
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"TargetTracker selects best target by FOV and hitbox" end time: Dec 30 14:41 Eastern Standard Time
+"TargetTracker selects best target by FOV and hitbox" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 30 14:41 Eastern Standard Time

@@ -1,0 +1,37 @@
+LatestFrameQueue - Basic push/pop 3 0.0125291
+LatestFrameQueue - Head-drop policy 3 0.014251
+LatestFrameQueue - Memory safety 3 0.0134287
+TexturePool - Basic Acquisition 3 0.0201998
+TexturePool - Starvation Logic 3 0.0464948
+TexturePool - RAII Compliance (Trap 1) 3 0.0192998
+PostProcessor - NMS 3 0.0187666
+PostProcessor - Confidence Filtering 3 0.0148454
+PostProcessor - Hitbox Mapping 3 0.0175794
+Vec2 basic operations 2 0.0521332
+TargetID comparison 2 0.0306482
+DetectionBatch construction 2 0.0268213
+DetectionBatch add detections 2 0.0261263
+DetectionBatch capacity limit 2 0.023895
+TargetDatabase construction 2 0.0231576
+TargetDatabase add target 2 0.0291166
+TargetDatabase prediction update 2 0.0221609
+TargetDatabase remove target 2 0.0216665
+IoU calculation 2 0.0301553
+Data association greedy matching 2 0.0225738
+Data association with lost targets 2 0.0230401
+Kalman stateless update 2 0.036342
+Kalman prediction with constant velocity 2 0.0241469
+Target selection filters by FOV 2 0.0210467
+Target selection prioritizes hitbox type 2 0.0289862
+Target selection returns nullopt when no targets in FOV 2 0.0309077
+Target selection handles empty database 2 0.0411233
+AimCommand default construction 2 0.0548038
+AimCommand with valid target 2 0.0372517
+AimCommand copy semantics 2 0.0322705
+TargetTracker initializes empty 2 0.0332091
+TargetTracker creates new track from detection 2 0.0204235
+TargetTracker updates existing track 1 0.0601458
+TargetTracker maintains tracks during grace period 1 0.0665467
+TargetTracker removes stale tracks after grace period 2 0.0202625
+TargetTracker selects best target by FOV and hitbox 2 0.0183387
+---

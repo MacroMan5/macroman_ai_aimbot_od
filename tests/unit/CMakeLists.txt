@@ -5,12 +5,21 @@ add_executable(unit_tests
     test_latest_frame_queue.cpp
     test_texture_pool.cpp
     test_post_processor.cpp
+    test_math_types.cpp
+    test_detection_batch.cpp
+    test_target_database.cpp
+    test_data_association.cpp
+    test_kalman_predictor.cpp
+    test_target_selector.cpp
+    test_aim_command.cpp
+    test_target_tracker.cpp
 )
 
 # Link libraries
 target_link_libraries(unit_tests PRIVATE
     macroman_core
     macroman_detection
+    macroman_tracking
     Catch2::Catch2WithMain
     d3d11.lib
     dxgi.lib
