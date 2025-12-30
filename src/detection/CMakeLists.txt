@@ -1,15 +1,5 @@
 # Detection module - DirectML and TensorRT backends
 
-# Find ONNX Runtime (using NuGet package location from root CMake)
-set(ONNXRUNTIME_ROOT "C:/Users/therouxe/.nuget/packages/microsoft.ml.onnxruntime.directml/1.22.0")
-set(ONNXRUNTIME_INCLUDE_DIR "${ONNXRUNTIME_ROOT}/build/native/include")
-set(ONNXRUNTIME_LIB_DIR "${ONNXRUNTIME_ROOT}/runtimes/win-x64/native")
-
-# Check if ONNX Runtime exists
-if(NOT EXISTS "${ONNXRUNTIME_INCLUDE_DIR}/onnxruntime_cxx_api.h")
-    message(FATAL_ERROR "ONNX Runtime not found at ${ONNXRUNTIME_ROOT}. Please install it via NuGet.")
-endif()
-
 add_library(macroman_detection
     directml/InputPreprocessor.cpp
     postprocess/PostProcessor.cpp
@@ -18,24 +8,27 @@ add_library(macroman_detection
 target_include_directories(macroman_detection PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/core
-    ${ONNXRUNTIME_INCLUDE_DIR}
 )
 
 # Link libraries
 target_link_libraries(macroman_detection PUBLIC
     macroman_core
+    onnxruntime
     d3d11.lib
     d3dcompiler.lib # For shader compilation if needed, or runtime loading
-    "${ONNXRUNTIME_LIB_DIR}/onnxruntime.lib"
 )
 
 # Copy ONNX Runtime DLL to output directory
-add_custom_command(TARGET macroman_detection POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${ONNXRUNTIME_LIB_DIR}/onnxruntime.dll"
-        "$<TARGET_FILE_DIR:macroman_detection>"
-    COMMENT "Copying onnxruntime.dll to output directory"
-)
+# We can use the IMPORTED_LOCATION property from the onnxruntime target
+get_target_property(ORT_DLL onnxruntime IMPORTED_LOCATION)
+if(ORT_DLL)
+    add_custom_command(TARGET macroman_detection POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${ORT_DLL}"
+            "$<TARGET_FILE_DIR:macroman_detection>"
+        COMMENT "Copying onnxruntime.dll to output directory"
+    )
+endif()
 
 # Compile HLSL Shader
 # Requires 'fxc' or 'dxc' available in path, or use VS rules.

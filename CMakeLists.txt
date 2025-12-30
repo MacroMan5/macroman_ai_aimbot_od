@@ -93,8 +93,16 @@ endif()
 # target_include_directories(serial PUBLIC "external/serial/include")
 # target_link_libraries(serial PRIVATE setupapi)
 
-# 9. ONNX Runtime (Detected from NuGet)
-set(ONNXRUNTIME_ROOT "C:/Users/therouxe/.nuget/packages/microsoft.ml.onnxruntime.directml/1.22.0")
+# 9. ONNX Runtime (Detected from NuGet or provided via -DONNXRUNTIME_ROOT)
+if(NOT ONNXRUNTIME_ROOT)
+    set(ONNXRUNTIME_ROOT "C:/Users/therouxe/.nuget/packages/microsoft.ml.onnxruntime.directml/1.22.0" CACHE PATH "Path to ONNX Runtime root")
+endif()
+
+# Fallback check
+if(NOT EXISTS "${ONNXRUNTIME_ROOT}")
+    message(WARNING "ONNX Runtime not found at ${ONNXRUNTIME_ROOT}. Please specify -DONNXRUNTIME_ROOT=<path>")
+endif()
+
 add_library(onnxruntime SHARED IMPORTED)
 set_target_properties(onnxruntime PROPERTIES
     IMPORTED_LOCATION "${ONNXRUNTIME_ROOT}/runtimes/win-x64/native/onnxruntime.dll"
