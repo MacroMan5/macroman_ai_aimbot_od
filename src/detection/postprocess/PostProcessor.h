@@ -1,68 +1,66 @@
 #pragma once
 
-#include "../../core/entities/Detection.h"
+/**
+ * SPECIFICATION: PostProcessor
+ * =============================
+ *
+ * PURPOSE:
+ * Post-process YOLO model outputs:
+ * 1. Non-Maximum Suppression (NMS) - Remove overlapping detections
+ * 2. Confidence filtering - Remove low-confidence detections
+ * 3. Hitbox mapping - Map classId to HitboxType
+ *
+ * NMS ALGORITHM:
+ * - IoU (Intersection over Union) threshold: 0.45 (from architecture doc)
+ * - Sort by confidence (descending)
+ * - Greedily select highest-confidence boxes, suppress overlapping ones
+ *
+ * HITBOX MAPPING (per-game configuration):
+ * - classId 0 → Head (highest priority)
+ * - classId 1 → Chest (medium priority)
+ * - classId 2 → Body (lowest priority)
+ *
+ * PERFORMANCE TARGET:
+ * - <1ms for typical detections (5-10 boxes)
+ */
+
+#include "core/entities/Detection.h"
 #include <vector>
+#include <unordered_map>
 
 namespace macroman {
 
-/**
- * Post-processing utilities for YOLO model outputs.
- * Provides NMS (Non-Maximum Suppression) and scaling operations.
- */
 class PostProcessor {
 public:
-    struct Config {
-        float confidenceThreshold = 0.25f;
-        float nmsThreshold = 0.45f;
-        std::vector<int> targetClasses = {0};
-        int inputWidth = 640;
-        int inputHeight = 640;
-    };
-
-    explicit PostProcessor(const Config& config);
-    PostProcessor() : PostProcessor(Config{}) {}
+    /**
+     * @brief Apply Non-Maximum Suppression
+     * @param detections Input detections (will be modified in-place)
+     * @param iouThreshold IoU threshold for suppression (default: 0.45)
+     *
+     * Modifies detections vector to remove suppressed boxes.
+     */
+    static void applyNMS(std::vector<Detection>& detections, float iouThreshold = 0.45f);
 
     /**
-     * Process raw model output into detections.
-     * @param output Raw float output from model
-     * @param numDetections Number of detections in output
-     * @return List of filtered detections after confidence filtering and NMS
+     * @brief Filter detections by confidence threshold
+     * @param detections Input detections (will be modified in-place)
+     * @param minConfidence Minimum confidence (default: 0.6)
      */
-    DetectionList process(const float* output, int numDetections);
+    static void filterByConfidence(std::vector<Detection>& detections, float minConfidence = 0.6f);
 
     /**
-     * Apply Non-Maximum Suppression to remove overlapping detections.
-     * @param detections Input detections (will not be modified)
-     * @param threshold IoU threshold above which detections are suppressed
-     * @return Filtered detection list
+     * @brief Map class IDs to hitbox types
+     * @param detections Input detections (will be modified in-place)
+     * @param hitboxMapping Map from classId to HitboxType
      */
-    static DetectionList applyNMS(const DetectionList& detections, float threshold);
-
-    /**
-     * Scale detection boxes from model coordinates to original image coordinates.
-     * @param detections Detections to scale (modified in place)
-     * @param modelWidth Model input width
-     * @param modelHeight Model input height
-     * @param imageWidth Original image width
-     * @param imageHeight Original image height
-     */
-    static void scaleToOriginal(DetectionList& detections,
-                                int modelWidth, int modelHeight,
-                                int imageWidth, int imageHeight);
-
-    /**
-     * Calculate Intersection over Union (IoU) between two boxes.
-     * @param a First bounding box
-     * @param b Second bounding box
-     * @return IoU value in range [0, 1]
-     */
-    static float calculateIoU(const cv::Rect& a, const cv::Rect& b);
-
-    void setConfig(const Config& config) { config_ = config; }
-    const Config& getConfig() const { return config_; }
+    static void mapHitboxes(
+        std::vector<Detection>& detections,
+        const std::unordered_map<int, HitboxType>& hitboxMapping
+    );
 
 private:
-    Config config_;
+    // Helper: Calculate Intersection over Union
+    static float calculateIoU(const BBox& a, const BBox& b);
 };
 
 } // namespace macroman

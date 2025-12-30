@@ -12,7 +12,7 @@ endif()
 
 add_library(macroman_detection
     directml/InputPreprocessor.cpp
-    # PostProcessor added later
+    postprocess/PostProcessor.cpp
 )
 
 target_include_directories(macroman_detection PUBLIC

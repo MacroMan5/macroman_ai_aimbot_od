@@ -1,27 +1,48 @@
 #pragma once
 
-#include <opencv2/core/types.hpp>
-#include <vector>
-#include <chrono>
+#include <cstdint>
 
 namespace macroman {
 
-struct Detection {
-    cv::Rect box;
-    float confidence;
-    int classId;
-    std::chrono::steady_clock::time_point captureTimestamp;
-
-    // Helpers
-    cv::Point center() const {
-        return cv::Point(box.x + box.width / 2, box.y + box.height / 2);
-    }
+/**
+ * @brief Bounding box in pixel coordinates
+ */
+struct BBox {
+    float x;        // Top-left X
+    float y;        // Top-left Y
+    float width;    // Width
+    float height;   // Height
 
     float area() const {
-        return static_cast<float>(box.width * box.height);
+        return width * height;
     }
 };
 
-using DetectionList = std::vector<Detection>;
+/**
+ * @brief Hitbox type classification
+ */
+enum class HitboxType : uint8_t {
+    Unknown = 0,
+    Head = 1,
+    Chest = 2,
+    Body = 3
+};
+
+/**
+ * @brief Single detection from YOLO model
+ */
+struct Detection {
+    BBox bbox;          // Bounding box
+    float confidence;   // Detection confidence [0.0, 1.0]
+    int classId;        // Class ID from model
+    HitboxType hitbox;  // Mapped hitbox type
+
+    Detection()
+        : bbox{0, 0, 0, 0}
+        , confidence(0.0f)
+        , classId(0)
+        , hitbox(HitboxType::Unknown)
+    {}
+};
 
 } // namespace macroman
