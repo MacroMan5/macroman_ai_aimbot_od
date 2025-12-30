@@ -19,3 +19,10 @@
 [2025-12-30 14:26:39.599] [warning] [macroman] [thread 1332] TexturePool starved at frame 4 (all 3 textures busy)
 [2025-12-30 14:26:39.599] [info] [macroman] [thread 1332] TexturePool shut down
 [2025-12-30 14:26:39.599] [info] [macroman] [thread 1332] TexturePool shut down
+[2025-12-30 14:30:04.825] [info] [macroman] [thread 31660] Logging system initialized
+[2025-12-30 14:30:04.825] [info] [macroman] [thread 31660] TexturePool shut down
+[2025-12-30 14:30:04.825] [info] [macroman] [thread 31660] TexturePool shut down
+[2025-12-30 14:30:04.825] [info] [macroman] [thread 31660] TexturePool shut down
+[2025-12-30 14:30:04.825] [warning] [macroman] [thread 31660] TexturePool starved at frame 4 (all 3 textures busy)
+[2025-12-30 14:30:04.826] [info] [macroman] [thread 31660] TexturePool shut down
+[2025-12-30 14:30:04.826] [info] [macroman] [thread 31660] TexturePool shut down
