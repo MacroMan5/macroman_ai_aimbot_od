@@ -1,8 +1,7 @@
 # Capture module - WinRT and Desktop Duplication
 
 add_library(macroman_capture
-    placeholder.cpp  # Temporary - will be replaced in P2-07/P2-08
-    # DuplicationCapture.h/cpp will be added in P2-07/P2-08
+    DuplicationCapture.cpp
 )
 
 target_include_directories(macroman_capture PUBLIC
