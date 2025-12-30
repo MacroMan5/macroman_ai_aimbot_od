@@ -1,0 +1,10 @@
+^C:\USERS\THEROUXE\SOURCE\REPOS\MARCOMAN_AI_AIMBOT\.WORKTREES\FEATURE-PHASE3-TRACKING\BUILD\_DEPS\CATCH2-SUBBUILD\CMAKEFILES\57D843A113357459B29EAF2CC4D0F7E0\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Insiders\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/catch2-subbuild -BC:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/catch2-subbuild --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/therouxe/source/repos/marcoman_ai_aimbot/.worktrees/feature-phase3-tracking/build/_deps/catch2-subbuild/catch2-populate.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

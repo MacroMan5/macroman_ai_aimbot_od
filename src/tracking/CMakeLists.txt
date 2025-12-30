@@ -1,5 +1,6 @@
 add_library(macroman_tracking STATIC
     DataAssociation.cpp
+    KalmanPredictor.cpp
 )
 
 target_include_directories(macroman_tracking PUBLIC
@@ -8,4 +9,5 @@ target_include_directories(macroman_tracking PUBLIC
 
 target_link_libraries(macroman_tracking PUBLIC
     macroman_core
+    Eigen3::Eigen
 )

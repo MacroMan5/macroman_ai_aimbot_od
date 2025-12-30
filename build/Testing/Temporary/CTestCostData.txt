@@ -1,0 +1,10 @@
+LatestFrameQueue - Basic push/pop 1 0.030412
+LatestFrameQueue - Head-drop policy 1 0.029859
+LatestFrameQueue - Memory safety 1 0.0316703
+TexturePool - Basic Acquisition 1 0.0337131
+TexturePool - Starvation Logic 1 0.0374385
+TexturePool - RAII Compliance (Trap 1) 1 0.0331195
+PostProcessor - NMS 1 0.0297024
+PostProcessor - Confidence Filtering 1 0.0269684
+PostProcessor - Hitbox Mapping 1 0.0319525
+---

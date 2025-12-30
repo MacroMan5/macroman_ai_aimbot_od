@@ -9,6 +9,7 @@ add_executable(unit_tests
     test_detection_batch.cpp
     test_target_database.cpp
     test_data_association.cpp
+    test_kalman_predictor.cpp
 )
 
 # Link libraries
