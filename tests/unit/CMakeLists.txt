@@ -7,6 +7,7 @@ add_executable(unit_tests
     test_post_processor.cpp
     test_math_types.cpp
     test_detection_batch.cpp
+    test_target_database.cpp
 )
 
 # Link libraries
