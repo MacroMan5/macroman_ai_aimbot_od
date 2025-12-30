@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 class WinrtCapture : public IScreenCapture {
 public:
@@ -43,4 +43,4 @@ private:
     bool initialized_ = false;
 };
 
-} // namespace sunone
+} // namespace macroman

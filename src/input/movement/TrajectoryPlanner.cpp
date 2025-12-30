@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace sunone {
+namespace macroman {
 
 TrajectoryPlanner::TrajectoryPlanner(const TrajectoryConfig& config)
     : config_(config) {
@@ -292,4 +292,4 @@ MouseMovement TrajectoryPlanner::applyWindMouse(const MouseMovement& raw) const 
     return raw;
 }
 
-} // namespace sunone
+} // namespace macroman

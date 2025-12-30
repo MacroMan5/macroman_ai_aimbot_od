@@ -7,7 +7,7 @@
 #include <mutex>
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 /**
  * @brief Arduino HID mouse driver implementation.
@@ -62,4 +62,4 @@ private:
     ThreadSafeQueue<Command> queue_;
 };
 
-} // namespace sunone
+} // namespace macroman

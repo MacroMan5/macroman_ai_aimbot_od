@@ -3,7 +3,7 @@
 #include "../../core/entities/Detection.h"
 #include <vector>
 
-namespace sunone {
+namespace macroman {
 
 /**
  * Post-processing utilities for YOLO model outputs.
@@ -65,4 +65,4 @@ private:
     Config config_;
 };
 
-} // namespace sunone
+} // namespace macroman

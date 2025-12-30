@@ -2,7 +2,7 @@
 #include <opencv2/core/types.hpp>
 #include <cmath>
 
-namespace sunone {
+namespace macroman {
 
 struct BezierCurve {
     cv::Point2f p0, p1, p2, p3;
@@ -39,4 +39,4 @@ struct BezierCurve {
     }
 };
 
-} // namespace sunone
+} // namespace macroman

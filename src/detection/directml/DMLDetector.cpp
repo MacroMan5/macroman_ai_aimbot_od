@@ -10,7 +10,7 @@
 #include <thread>
 #include <d3dcompiler.h>
 
-namespace sunone {
+namespace macroman {
 
 DMLDetector::DMLDetector()
     : env_(ORT_LOGGING_LEVEL_WARNING, "SunoneAimbot_DML"),
@@ -447,4 +447,4 @@ int DMLDetector::getNumberOfClasses() const {
     return modelInfo_.numClasses;
 }
 
-} // namespace sunone
+} // namespace macroman

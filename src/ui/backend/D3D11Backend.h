@@ -5,7 +5,7 @@
 #include <wrl/client.h>
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 using Microsoft::WRL::ComPtr;
 
@@ -48,4 +48,4 @@ private:
     bool initialized_ = false;
 };
 
-} // namespace sunone
+} // namespace macroman

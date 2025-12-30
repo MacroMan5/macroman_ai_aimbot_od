@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sunone {
+namespace macroman {
 
 enum class CaptureMethod {
     DesktopDuplication,
@@ -38,4 +38,4 @@ enum class TargetPivot {
     Custom
 };
 
-} // namespace sunone
+} // namespace macroman

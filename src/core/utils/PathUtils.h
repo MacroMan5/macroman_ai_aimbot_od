@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace sunone {
+namespace macroman {
 
 /**
  * Path utility functions for normalizing and validating file paths
@@ -129,5 +129,5 @@ public:
     }
 };
 
-} // namespace sunone
+} // namespace macroman
 

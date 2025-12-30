@@ -15,8 +15,8 @@ target_include_directories(aimbot_detection PRIVATE
 
 target_link_libraries(aimbot_detection PUBLIC 
     aimbot_core 
-    OpenCV::opencv_core 
-    OpenCV::opencv_imgproc
+    ${OpenCV_LIBRARIES}
+    onnxruntime
     d3d11.lib 
     d3dcompiler.lib
 )

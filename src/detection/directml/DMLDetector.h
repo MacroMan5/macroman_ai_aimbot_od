@@ -13,7 +13,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace sunone {
+namespace macroman {
 
 class DMLDetector : public IDetector {
 public:
@@ -100,4 +100,4 @@ private:
     bool compileComputeShader();
 };
 
-} // namespace sunone
+} // namespace macroman

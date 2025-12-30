@@ -16,7 +16,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace sunone {
+namespace macroman {
 
 class DuplicationCapture::Impl {
 public:
@@ -300,4 +300,4 @@ void DuplicationCapture::setMonitor(int index) {
     }
 }
 
-} // namespace sunone
+} // namespace macroman

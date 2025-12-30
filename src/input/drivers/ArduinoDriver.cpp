@@ -2,7 +2,7 @@
 #include <iostream>
 #include <thread>
 
-namespace sunone {
+namespace macroman {
 
 ArduinoDriver::ArduinoDriver(const std::string& port, int baudrate, bool enableKeys)
     : port_(port)
@@ -198,4 +198,4 @@ bool ArduinoDriver::supportsHardwareKeys() const {
     return enableKeys_;
 }
 
-} // namespace sunone
+} // namespace macroman

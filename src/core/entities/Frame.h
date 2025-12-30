@@ -6,7 +6,7 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 
-namespace sunone {
+namespace macroman {
 
 struct Frame {
     // Legacy CPU path
@@ -46,4 +46,4 @@ struct Frame {
     bool empty() const { return image.empty() && gpuTexture == nullptr; }
 };
 
-} // namespace sunone
+} // namespace macroman

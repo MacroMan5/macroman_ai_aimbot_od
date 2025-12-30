@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../core/interfaces/IScreenCapture.h"
+#include "core/interfaces/IScreenCapture.h"
 #include <memory>
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -11,7 +11,7 @@
 #endif
 #include <Windows.h>
 
-namespace sunone {
+namespace macroman {
 
 class DuplicationCapture : public IScreenCapture {
 public:
@@ -49,4 +49,4 @@ private:
     bool cpuReadback_ = false; // Default to false for zero-copy performance
 };
 
-} // namespace sunone
+} // namespace macroman

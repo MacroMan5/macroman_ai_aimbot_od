@@ -26,7 +26,7 @@ extern "C" void launchPreprocessKernel(
     cudaStream_t stream
 );
 
-namespace sunone {
+namespace macroman {
 
 // TensorRT logger
 class TRTLogger : public nvinfer1::ILogger {
@@ -645,6 +645,6 @@ ModelInfo TensorRTDetector::getModelInfo() const {
     return modelInfo_;
 }
 
-} // namespace sunone
+} // namespace macroman
 
 #endif // USE_CUDA

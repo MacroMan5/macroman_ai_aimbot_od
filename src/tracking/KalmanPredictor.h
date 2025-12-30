@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../core/interfaces/ITargetPredictor.h"
+#include "core/interfaces/ITargetPredictor.h"
 #include <opencv2/video/tracking.hpp>
 #include <chrono>
 #include <deque>
 
-namespace sunone {
+namespace macroman {
 
 /**
  * @class KalmanPredictor
@@ -107,4 +107,4 @@ private:
     float measurementNoise_ = 1e-2f;
 };
 
-} // namespace sunone
+} // namespace macroman

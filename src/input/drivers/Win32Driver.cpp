@@ -1,6 +1,6 @@
 #include "Win32Driver.h"
 
-namespace sunone {
+namespace macroman {
 
 bool Win32Driver::initialize() {
     // Win32 SendInput is always available on Windows
@@ -87,4 +87,4 @@ DWORD Win32Driver::buttonToUpFlag(MouseButton button) const {
     }
 }
 
-} // namespace sunone
+} // namespace macroman

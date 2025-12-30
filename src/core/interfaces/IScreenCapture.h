@@ -3,7 +3,7 @@
 #include "../entities/Frame.h"
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 class IScreenCapture {
 public:
@@ -29,4 +29,4 @@ public:
     virtual void setCpuReadback(bool enabled) {}
 };
 
-} // namespace sunone
+} // namespace macroman

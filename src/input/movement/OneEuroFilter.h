@@ -2,7 +2,7 @@
 #include <cmath>
 #include <chrono>
 
-namespace sunone {
+namespace macroman {
 
 class LowPassFilter {
 public:
@@ -83,4 +83,4 @@ private:
     LowPassFilter dxFilter_;
 };
 
-} // namespace sunone
+} // namespace macroman

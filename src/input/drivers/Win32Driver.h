@@ -10,7 +10,7 @@
 
 #include "../../core/interfaces/IMouseDriver.h"
 
-namespace sunone {
+namespace macroman {
 
 /**
  * @brief Win32 SendInput mouse driver implementation.
@@ -42,4 +42,4 @@ private:
     DWORD buttonToUpFlag(MouseButton button) const;
 };
 
-} // namespace sunone
+} // namespace macroman

@@ -4,7 +4,7 @@
 #include <vector>
 #include <chrono>
 
-namespace sunone {
+namespace macroman {
 
 struct Detection {
     cv::Rect box;
@@ -24,4 +24,4 @@ struct Detection {
 
 using DetectionList = std::vector<Detection>;
 
-} // namespace sunone
+} // namespace macroman

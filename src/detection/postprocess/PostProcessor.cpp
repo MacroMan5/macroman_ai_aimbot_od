@@ -3,7 +3,7 @@
 #include <numeric>
 #include <cmath>
 
-namespace sunone {
+namespace macroman {
 
 PostProcessor::PostProcessor(const Config& config)
     : config_(config) {}
@@ -136,4 +136,4 @@ void PostProcessor::scaleToOriginal(DetectionList& detections,
     }
 }
 
-} // namespace sunone
+} // namespace macroman
