@@ -26,6 +26,7 @@ add_library(macroman_core
     utils/Logger.cpp
     entities/TexturePool.cpp
     config/ProfileManager.cpp
+    config/GameDetector.cpp
 )
 
 target_include_directories(macroman_core PUBLIC
@@ -43,6 +44,7 @@ target_link_libraries(macroman_core PUBLIC
     nlohmann_json::nlohmann_json
     d3d11.lib
     dxgi.lib
+    Psapi.lib
 )
 
 # C++20 features required
