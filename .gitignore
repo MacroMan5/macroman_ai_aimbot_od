@@ -3,12 +3,14 @@
 out/
 
 # Build artifacts
+build/
 *.exe
 *.dll
 *.lib
 *.obj
 *.pdb
 *.ilk
+nul
 
 # CMake
 CMakeCache.txt
