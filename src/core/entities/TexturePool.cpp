@@ -113,11 +113,4 @@ void TexturePool::shutdown() {
     LOG_INFO("TexturePool shut down");
 }
 
-// TextureDeleter implementation (CRITICAL: Prevents "Leak on Drop" trap)
-void TextureDeleter::operator()(Texture* tex) const noexcept {
-    if (pool && tex) {
-        pool->release(tex);
-    }
-}
-
 } // namespace macroman
