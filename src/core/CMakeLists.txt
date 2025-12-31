@@ -27,6 +27,7 @@ add_library(macroman_core
     entities/TexturePool.cpp
     config/ProfileManager.cpp
     config/GameDetector.cpp
+    config/ModelManager.cpp
 )
 
 target_include_directories(macroman_core PUBLIC

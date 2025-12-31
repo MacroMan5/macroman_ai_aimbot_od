@@ -17,6 +17,7 @@ add_executable(unit_tests
     test_input_integration.cpp
     test_profile_manager.cpp
     test_game_detector.cpp
+    test_shared_config.cpp
 )
 
 # Link libraries
