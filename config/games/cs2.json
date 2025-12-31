@@ -1,0 +1,26 @@
+{
+  "gameId": "cs2",
+  "displayName": "Counter-Strike 2",
+  "processNames": ["cs2.exe"],
+  "windowTitles": ["Counter-Strike 2"],
+
+  "detection": {
+    "modelPath": "models/cs2_yolov8_640.onnx",
+    "inputSize": [640, 640],
+    "confidenceThreshold": 0.55,
+    "nmsThreshold": 0.4,
+    "hitboxMapping": {
+      "0": "head",
+      "1": "chest",
+      "2": "body"
+    }
+  },
+
+  "targeting": {
+    "fov": 90.0,
+    "smoothness": 0.7,
+    "predictionStrength": 0.75,
+    "hitboxPriority": ["head", "chest", "body"],
+    "inputLatency": 15.0
+  }
+}
