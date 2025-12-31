@@ -7,6 +7,9 @@
 
 namespace macroman {
 
+// Type alias for detection results
+using DetectionList = std::vector<Detection>;
+
 struct ModelInfo {
     int inputWidth;
     int inputHeight;

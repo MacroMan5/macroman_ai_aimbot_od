@@ -13,6 +13,8 @@ add_executable(unit_tests
     test_target_selector.cpp
     test_aim_command.cpp
     test_target_tracker.cpp
+    test_input_humanization.cpp
+    test_input_integration.cpp
 )
 
 # Link libraries
@@ -20,6 +22,7 @@ target_link_libraries(unit_tests PRIVATE
     macroman_core
     macroman_detection
     macroman_tracking
+    macroman_input
     Catch2::Catch2WithMain
     d3d11.lib
     dxgi.lib
@@ -30,6 +33,7 @@ target_include_directories(unit_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/detection
+    ${CMAKE_SOURCE_DIR}/src/input
 )
 
 # Add to CTest

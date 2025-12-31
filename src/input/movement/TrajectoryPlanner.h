@@ -1,9 +1,9 @@
 #pragma once
 
 #include "core/entities/MouseMovement.h"
+#include "core/entities/MathTypes.h"
 #include "BezierCurve.h"
 #include "OneEuroFilter.h"
-#include <opencv2/core/types.hpp>
 #include <random>
 
 namespace macroman {
@@ -76,8 +76,8 @@ public:
      * @param target The destination pixel coordinates.
      * @return MouseMovement containing dx, dy values for the input driver.
      */
-    MouseMovement plan(const cv::Point2f& current,
-                      const cv::Point2f& target);
+    MouseMovement plan(const Vec2& current,
+                      const Vec2& target);
 
     /**
      * @brief Plans a movement that blends the current target position with a predicted future position.
@@ -87,8 +87,8 @@ public:
      * @param confidence A weight [0.0 - 1.0] used to interpolate between the
      *                   raw detection (0.0) and the full prediction (1.0).
      */
-    MouseMovement planWithPrediction(const cv::Point2f& current,
-                                     const cv::Point2f& predicted,
+    MouseMovement planWithPrediction(const Vec2& current,
+                                     const Vec2& predicted,
                                      float confidence);
 
     /**
@@ -115,22 +115,22 @@ private:
     MouseMovement applyWindMouse(const MouseMovement& raw) const;
 
     // Bezier logic
-    MouseMovement advanceBezier(const cv::Point2f& current, const cv::Point2f& target, float dt);
-    void generateNewCurve(const cv::Point2f& start, const cv::Point2f& end);
-    void updateCurveEnd(const cv::Point2f& current, const cv::Point2f& newEnd);
-    
+    MouseMovement advanceBezier(const Vec2& current, const Vec2& target, float dt);
+    void generateNewCurve(const Vec2& start, const Vec2& end);
+    void updateCurveEnd(const Vec2& current, const Vec2& newEnd);
+
     TrajectoryConfig config_;
-    
+
     // State
     BezierCurve activeCurve_;
     float t_ = 0.0f;
     float stepSize_ = 0.01f; // Calculated based on duration
     bool hasActivePath_ = false;
-    cv::Point2f lastTarget_ = {0, 0};
-    
+    Vec2 lastTarget_ = {0, 0};
+
     // Time & Velocity tracking
     std::chrono::steady_clock::time_point lastTime_;
-    cv::Point2f currentVelocity_ = {0, 0}; // pixels/sec
+    Vec2 currentVelocity_ = {0, 0}; // pixels/sec
 
     // Filters
     OneEuroFilter filterX_;

@@ -1,9 +1,26 @@
 # Detection module - DirectML and TensorRT backends
 
-add_library(macroman_detection
+# Core detection sources
+set(DETECTION_SOURCES
     directml/InputPreprocessor.cpp
     postprocess/PostProcessor.cpp
 )
+
+# DirectML detector (default - works on all GPUs)
+list(APPEND DETECTION_SOURCES
+    directml/DMLDetector.cpp
+)
+
+# TensorRT detector (NVIDIA-only, conditional)
+if(ENABLE_TENSORRT)
+    list(APPEND DETECTION_SOURCES
+        tensorrt/TensorRTDetector.cpp
+    )
+    add_compile_definitions(USE_CUDA)
+    message(STATUS "TensorRT detector enabled")
+endif()
+
+add_library(macroman_detection STATIC ${DETECTION_SOURCES})
 
 target_include_directories(macroman_detection PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -17,6 +34,15 @@ target_link_libraries(macroman_detection PUBLIC
     d3d11.lib
     d3dcompiler.lib # For shader compilation if needed, or runtime loading
 )
+
+# Conditional TensorRT dependencies
+if(ENABLE_TENSORRT)
+    target_link_libraries(macroman_detection PRIVATE
+        TensorRT::nvinfer
+        TensorRT::nvonnxparser
+        CUDA::cudart
+    )
+endif()
 
 # Copy ONNX Runtime DLL to output directory
 # We can use the IMPORTED_LOCATION property from the onnxruntime target

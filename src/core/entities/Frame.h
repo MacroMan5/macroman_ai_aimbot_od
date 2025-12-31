@@ -18,6 +18,11 @@ namespace macroman {
  * - TextureHandle destructor calls TextureDeleter::operator()
  * - TextureDeleter calls pool->release(texture), decrementing refCount
  * - Texture becomes available for next capture
+ *
+ * DESIGN DECISIONS:
+ * - No CPU image buffer (cv::Mat) - GPU-first, zero-copy architecture
+ * - No ROI fields (roiX, roiY) - region-of-interest handled in preprocessing shader
+ * - TextureHandle manages lifetime via RAII with pool refcounting
  */
 struct Frame {
     TextureHandle texture{nullptr};             // RAII handle (manages pool lifetime)
@@ -43,6 +48,17 @@ struct Frame {
      */
     [[nodiscard]] bool isValid() const noexcept {
         return texture != nullptr && texture->isValid() && width > 0 && height > 0;
+    }
+
+    /**
+     * @brief Check if frame is empty (inverse of isValid)
+     * @return true if frame is invalid
+     *
+     * Compatibility method for detector code that checks frame.empty().
+     * Equivalent to !isValid().
+     */
+    [[nodiscard]] bool empty() const noexcept {
+        return !isValid();
     }
 
     /**
