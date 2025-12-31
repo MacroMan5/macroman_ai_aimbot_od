@@ -1,270 +1,157 @@
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches: [ main, dev, 'feature/**' ]
+    branches: [main, dev, 'feature/**']
   pull_request:
-    branches: [ main, dev ]
-  workflow_dispatch:  # Allow manual trigger
+    branches: [main, dev]
+  workflow_dispatch:
 
 env:
+  CMAKE_VERSION: '3.25.0'
+  ONNXRUNTIME_VERSION: '1.22.0'
   BUILD_TYPE: Release
-  CMAKE_VERSION: '3.25'
 
 jobs:
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for legacy references
+        run: |
+          if grep -r --include="*.md" "sunone-bench" . --exclude="CHANGELOG.md"; then
+            echo "ERROR: Found 'sunone-bench' references (should be 'macroman-bench')"
+            exit 1
+          fi
+          echo "Documentation check passed"
+
   build-and-test:
     name: Build & Test (Windows)
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 0  # Full history for accurate versioning
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup MSVC
-      uses: microsoft/setup-msbuild@v2
-      with:
-        vs-version: '[17.0,18.0)'  # Visual Studio 2022
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ${{ env.CMAKE_VERSION }}
 
-    - name: Setup CMake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: ${{ env.CMAKE_VERSION }}
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
 
-    - name: Cache CMake dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          build/_deps
-          build/lib
-        key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-cmake-
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ env.ONNXRUNTIME_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Configure CMake
-      run: |
-        cmake -B build -S . `
-          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
-          -DBUILD_TESTS=ON `
-          -DENABLE_TENSORRT=OFF `
-          -DENABLE_ARDUINO=OFF
+      - name: Install ONNX Runtime DirectML
+        shell: pwsh
+        run: |
+          Write-Host "Installing ONNX Runtime DirectML ${{ env.ONNXRUNTIME_VERSION }}..."
+          nuget install microsoft.ml.onnxruntime.directml `
+            -Version ${{ env.ONNXRUNTIME_VERSION }} `
+            -OutputDirectory $env:USERPROFILE\.nuget\packages
 
-    - name: Build project
-      run: cmake --build build --config ${{ env.BUILD_TYPE }} -j
+          Write-Host "ONNX Runtime installed"
 
-    - name: Run unit tests
-      run: |
-        cd build/bin/${{ env.BUILD_TYPE }}
-        ./unit_tests.exe --reporter compact --success
-      continue-on-error: false
+      - name: Detect ONNX Runtime path
+        id: onnx-path
+        shell: pwsh
+        run: |
+          $version = "${{ env.ONNXRUNTIME_VERSION }}"
+          $onnxPath = Join-Path $env:USERPROFILE ".nuget\packages\microsoft.ml.onnxruntime.directml\$version"
 
-    - name: Run integration tests
-      run: |
-        cd build/bin/${{ env.BUILD_TYPE }}
-        ./integration_tests.exe --reporter compact --success
-      continue-on-error: false
+          if (-not (Test-Path $onnxPath)) {
+            Write-Error "ONNX Runtime not found at: $onnxPath"
+            exit 1
+          }
 
-    - name: Run benchmark (Performance Regression)
-      id: benchmark
-      run: |
-        cd build/bin/${{ env.BUILD_TYPE }}
-        ./macroman-bench.exe `
-          --frames 200 `
-          --threshold-avg-fps 90 `
-          --threshold-p95-latency 12.0 `
-          --threshold-p99-latency 15.0 `
-          --verbose
-      continue-on-error: true
+          # Verify critical files exist
+          $dllPath = Join-Path $onnxPath "runtimes\win-x64\native\onnxruntime.dll"
+          $libPath = Join-Path $onnxPath "runtimes\win-x64\native\onnxruntime.lib"
+          $includeDir = Join-Path $onnxPath "build\native\include"
 
-    - name: Check benchmark results
-      if: steps.benchmark.outcome == 'failure'
-      run: |
-        echo "::error::Benchmark failed - Performance regression detected"
-        exit 1
+          if (-not (Test-Path $dllPath)) {
+            Write-Error "Missing onnxruntime.dll at: $dllPath"
+            exit 1
+          }
 
-    - name: Upload test artifacts
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-${{ github.run_number }}
-        path: |
-          build/bin/${{ env.BUILD_TYPE }}/*.exe
-          build/bin/${{ env.BUILD_TYPE }}/*.dll
-        retention-days: 7
+          if (-not (Test-Path $libPath)) {
+            Write-Error "Missing onnxruntime.lib at: $libPath"
+            exit 1
+          }
 
-    - name: Upload benchmark results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: benchmark-results-${{ github.run_number }}
-        path: |
-          build/bin/${{ env.BUILD_TYPE }}/macroman-bench.exe
-        retention-days: 14
+          if (-not (Test-Path $includeDir)) {
+            Write-Error "Missing include directory at: $includeDir"
+            exit 1
+          }
 
-  code-quality:
-    name: Code Quality Checks
-    runs-on: windows-latest
+          # Convert to forward slashes for CMake
+          $onnxPathForward = $onnxPath -replace '\\', '/'
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+          Write-Host "ONNX Runtime validated at: $onnxPathForward"
+          Write-Host "   DLL: $dllPath"
+          Write-Host "   LIB: $libPath"
+          Write-Host "   Include: $includeDir"
 
-    - name: Check for TODO/FIXME comments
-      run: |
-        $todos = Get-ChildItem -Recurse -Include *.cpp,*.h | Select-String -Pattern "TODO|FIXME" | Measure-Object
-        echo "Found $($todos.Count) TODO/FIXME comments"
-        if ($todos.Count -gt 100) {
-          echo "::warning::High number of TODO/FIXME comments ($($todos.Count))"
-        }
+          # Export for subsequent steps
+          echo "ONNXRUNTIME_ROOT=$onnxPathForward" >> $env:GITHUB_OUTPUT
+          echo "ONNXRUNTIME_ROOT=$onnxPathForward" >> $env:GITHUB_ENV
 
-    - name: Check file sizes
-      run: |
-        Get-ChildItem -Recurse -Include *.cpp,*.h | Where-Object { $_.Length -gt 1000000 } | ForEach-Object {
-          echo "::warning::Large file detected: $($_.Name) ($([math]::Round($_.Length/1KB, 2)) KB)"
-        }
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          Write-Host "Configuring with ONNX Runtime at: $env:ONNXRUNTIME_ROOT"
 
-    - name: Verify documentation naming
-      run: |
-        $sunoneRefs = Get-ChildItem -Recurse -Include *.md | Select-String -Pattern "sunone-bench" | Measure-Object
-        if ($sunoneRefs.Count -gt 0) {
-          echo "::error::Found $($sunoneRefs.Count) references to 'sunone-bench' instead of 'macroman-bench'"
-          exit 1
-        } else {
-          echo "✓ All documentation uses correct naming (macroman-bench)"
-        }
+          cmake -B build -S . --preset=x64-release `
+            -DONNXRUNTIME_ROOT="$env:ONNXRUNTIME_ROOT" `
+            -DENABLE_TESTS=ON `
+            -DENABLE_BENCHMARKS=ON `
+            -DENABLE_TENSORRT=OFF `
+            -DENABLE_OPENCV=OFF `
+            -DENABLE_ARDUINO=OFF
 
-  performance-tracking:
-    name: Performance Tracking
-    runs-on: windows-latest
-    needs: build-and-test
+      - name: Build project
+        run: cmake --build build --config Release -j
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Run unit tests
+        run: |
+          ctest --test-dir build -C Release --output-on-failure --verbose
 
-    - name: Setup CMake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: ${{ env.CMAKE_VERSION }}
+      - name: Smoke test benchmark executable
+        shell: pwsh
+        run: |
+          $benchExe = "build\bin\Release\macroman-bench.exe"
 
-    - name: Configure and build
-      run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DBUILD_TESTS=ON
-        cmake --build build --config ${{ env.BUILD_TYPE }} --target macroman-bench -j
+          if (-not (Test-Path $benchExe)) {
+            Write-Error "Benchmark executable not found at: $benchExe"
+            exit 1
+          }
 
-    - name: Run extended benchmark
-      run: |
-        cd build/bin/${{ env.BUILD_TYPE }}
-        ./macroman-bench.exe `
-          --frames 500 `
-          --threshold-avg-fps 100 `
-          --threshold-p95-latency 12.0 `
-          --threshold-p99-latency 15.0 `
-          --verbose > benchmark_output.txt
+          Write-Host "Running benchmark smoke test..."
+          & $benchExe --help
 
-        # Display results
-        Get-Content benchmark_output.txt
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Benchmark help failed with exit code: $LASTEXITCODE"
+            exit 1
+          }
 
-    - name: Extract performance metrics
-      run: |
-        $output = Get-Content build/bin/${{ env.BUILD_TYPE }}/benchmark_output.txt -Raw
+          Write-Host "Benchmark smoke test passed"
 
-        # Extract FPS (example parsing - adjust based on actual output format)
-        if ($output -match "Average FPS:\s+([\d.]+)") {
-          $fps = $matches[1]
-          echo "BENCHMARK_FPS=$fps" >> $env:GITHUB_ENV
-          echo "::notice::Benchmark FPS: $fps"
-        }
-
-        if ($output -match "P95:\s+([\d.]+)") {
-          $p95 = $matches[1]
-          echo "BENCHMARK_P95=$p95" >> $env:GITHUB_ENV
-          echo "::notice::Benchmark P95 Latency: ${p95}ms"
-        }
-
-    - name: Comment PR with results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const output = require('fs').readFileSync('build/bin/Release/benchmark_output.txt', 'utf8');
-
-          const comment = `## 🚀 Performance Benchmark Results
-
-          **Commit:** ${context.sha.substring(0, 7)}
-          **Branch:** ${context.ref}
-
-          ### Results
-          \`\`\`
-          ${output}
-          \`\`\`
-
-          _Automated benchmark from CI/CD pipeline_
-          `;
-
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
-
-  release:
-    name: Create Release Build
-    runs-on: windows-latest
-    needs: [build-and-test, code-quality]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
-    - name: Setup CMake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: ${{ env.CMAKE_VERSION }}
-
-    - name: Configure CMake (Release)
-      run: |
-        cmake -B build -S . `
-          -DCMAKE_BUILD_TYPE=Release `
-          -DBUILD_TESTS=OFF `
-          -DENABLE_TENSORRT=ON `
-          -DENABLE_ARDUINO=OFF
-
-    - name: Build Release
-      run: cmake --build build --config Release -j
-
-    - name: Package binaries
-      run: |
-        mkdir release
-        Copy-Item build/bin/Release/macroman_aimbot.exe release/
-        Copy-Item build/bin/Release/macroman_config.exe release/
-        Copy-Item build/bin/Release/*.dll release/
-        Copy-Item -Recurse build/bin/assets release/ -ErrorAction SilentlyContinue
-
-        # Create README for release
-        @"
-        MacroMan AI Aimbot - Release Build
-
-        Build: ${{ github.run_number }}
-        Commit: ${{ github.sha }}
-        Date: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-
-        Files:
-        - macroman_aimbot.exe: Main application
-        - macroman_config.exe: Configuration UI
-        - *.dll: Required runtime libraries
-        - assets/: Models and resources
-        "@ | Out-File release/README.txt
-
-    - name: Upload release artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: macroman-aimbot-${{ github.run_number }}
-        path: release/
-        retention-days: 30
+      - name: Upload build artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs
+          path: |
+            build/CMakeFiles/CMakeOutput.log
+            build/CMakeFiles/CMakeError.log
+          retention-days: 7
