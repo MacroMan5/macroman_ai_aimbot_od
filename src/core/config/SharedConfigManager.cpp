@@ -73,8 +73,8 @@ bool SharedConfigManager::createMapping(const std::string& mappingName) {
         return false;
     }
 
-    // Initialize SharedConfig to default values (Engine is creator)
-    sharedConfig_->reset();
+    // Construct SharedConfig in mapped memory using placement new (Engine is creator)
+    new (sharedConfig_) SharedConfig{};  // ✅ Proper object construction before member function calls
     isCreator_ = true;
 
     LOG_INFO("SharedConfigManager: Created mapping '{}' ({} bytes)",
@@ -136,6 +136,11 @@ bool SharedConfigManager::openMapping(const std::string& mappingName) {
 
 void SharedConfigManager::close() {
     if (sharedConfig_) {
+        // Explicitly destroy SharedConfig if we created it (placement new cleanup)
+        if (isCreator_) {
+            sharedConfig_->~SharedConfig();
+        }
+
         UnmapViewOfFile(sharedConfig_);
         sharedConfig_ = nullptr;
     }

@@ -98,6 +98,7 @@ private:
     // Hysteresis state
     std::optional<std::string> candidateGameId_;
     std::chrono::steady_clock::time_point candidateStartTime_;
+    std::optional<std::string> activeGameId_;  // Currently active game (committed after hysteresis)
     static constexpr std::chrono::seconds HYSTERESIS_DURATION{3};
 
     // Platform-specific helpers

@@ -38,9 +38,15 @@ void GameDetector::poll() {
     );
 
     if (!profile) {
-        // No matching profile - reset candidate
+        // No matching profile - reset both candidate and active game
         candidateGameId_.reset();
+        activeGameId_.reset();
         return;
+    }
+
+    // Check if this is the currently active game (no action needed)
+    if (activeGameId_.has_value() && activeGameId_.value() == profile->gameId) {
+        return;  // Same game still active - no callback re-trigger
     }
 
     // Check if this is a new candidate or same as before
@@ -66,7 +72,8 @@ void GameDetector::poll() {
             gameChangedCallback_(*profile, gameInfo);
         }
 
-        // Reset candidate to avoid repeated callbacks
+        // Mark this game as active to prevent re-triggering
+        activeGameId_ = profile->gameId;
         candidateGameId_.reset();
     }
 }
