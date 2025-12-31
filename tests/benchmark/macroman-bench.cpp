@@ -228,6 +228,17 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
     std::vector<float> sortedLatencies = results.latencySamples;
     std::sort(sortedLatencies.begin(), sortedLatencies.end());
 
+    // ✅ Defensive check: Handle empty latency samples gracefully
+    if (sortedLatencies.empty()) {
+        std::cerr << "ERROR: No latency samples collected (zero frames processed)\n";
+        std::cerr << "Possible causes:\n";
+        std::cerr << "  - --frames 0 was passed\n";
+        std::cerr << "  - FakeScreenCapture::initialize() failed\n";
+        std::cerr << "  - Benchmark loop did not execute\n";
+        results.passed = false;
+        return results;
+    }
+
     results.minLatency = sortedLatencies.front();
     results.maxLatency = sortedLatencies.back();
     results.avgLatency = std::accumulate(sortedLatencies.begin(), sortedLatencies.end(), 0.0f) / sortedLatencies.size();
