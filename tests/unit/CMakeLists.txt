@@ -18,6 +18,7 @@ add_executable(unit_tests
     test_profile_manager.cpp
     test_game_detector.cpp
     test_shared_config.cpp
+    test_debug_overlay.cpp
 )
 
 # Link libraries
@@ -26,6 +27,8 @@ target_link_libraries(unit_tests PRIVATE
     macroman_detection
     macroman_tracking
     macroman_input
+    macroman_ui
+    imgui
     Catch2::Catch2WithMain
     d3d11.lib
     dxgi.lib
@@ -37,6 +40,7 @@ target_include_directories(unit_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/detection
     ${CMAKE_SOURCE_DIR}/src/input
+    ${CMAKE_SOURCE_DIR}/src/ui
 )
 
 # Add to CTest

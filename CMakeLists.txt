@@ -69,15 +69,32 @@ else()
     message(WARNING "OpenCV not found - some features may be unavailable")
 endif()
 
-# 5. ImGui (Build from source) - DISABLED FOR PHASE 2 (UI comes in Phase 5+)
-# file(GLOB IMGUI_SOURCES
-#     "external/imgui/*.cpp"
-#     "external/imgui/backends/imgui_impl_win32.cpp"
-#     "external/imgui/backends/imgui_impl_dx11.cpp"
-# )
-# add_library(imgui STATIC ${IMGUI_SOURCES})
-# target_include_directories(imgui PUBLIC "external/imgui" "external/imgui/backends")
-# target_link_libraries(imgui PRIVATE d3d11.lib d3dcompiler.lib dwmapi.lib)
+# 5. ImGui (Fetch from GitHub) - ENABLED FOR PHASE 6 (UI & Observability)
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG v1.91.2
+)
+# Use Populate instead of MakeAvailable since ImGui has no CMakeLists.txt
+FetchContent_Populate(imgui)
+FetchContent_GetProperties(imgui)
+
+# ImGui doesn't provide CMakeLists.txt, so we build it manually
+set(IMGUI_SOURCES
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
+)
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PUBLIC
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+target_link_libraries(imgui PRIVATE d3d11.lib d3dcompiler.lib dwmapi.lib)
 
 # 6. SimpleIni - DISABLED FOR PHASE 2 (Config comes in Phase 5)
 # add_library(simpleini INTERFACE)
