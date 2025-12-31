@@ -15,6 +15,7 @@ add_executable(unit_tests
     test_target_tracker.cpp
     test_input_humanization.cpp
     test_input_integration.cpp
+    test_profile_manager.cpp
 )
 
 # Link libraries
