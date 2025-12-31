@@ -149,8 +149,8 @@ void InputManager::inputLoop() {
         // ================================================================
         if (cmd.hasTarget) {
             // Current position (screen center / crosshair)
-            cv::Point2f current = config_.crosshairPos;
-            cv::Point2f target = cv::Point2f(cmd.targetPosition.x, cmd.targetPosition.y);
+            Vec2 current = config_.crosshairPos;
+            Vec2 target = Vec2{cmd.targetPosition.x, cmd.targetPosition.y};
 
             // Apply humanization: Tremor (micro-jitter)
             // dt = time since last iteration (approximately 1ms)

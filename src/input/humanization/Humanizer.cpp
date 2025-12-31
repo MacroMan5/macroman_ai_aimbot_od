@@ -29,7 +29,7 @@ float Humanizer::getReactionDelay() {
     return delay;
 }
 
-cv::Point2f Humanizer::applyTremor(const cv::Point2f& movement, float dt) {
+Vec2 Humanizer::applyTremor(const Vec2& movement, float dt) {
     if (!config_.enableTremor) {
         return movement;
     }

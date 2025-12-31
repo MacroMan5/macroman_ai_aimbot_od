@@ -2,6 +2,7 @@
 
 #include "core/interfaces/IMouseDriver.h"
 #include "core/entities/AimCommand.h"
+#include "core/entities/MathTypes.h"
 #include "movement/TrajectoryPlanner.h"
 #include "humanization/Humanizer.h"
 #include <atomic>
@@ -34,7 +35,7 @@ struct InputConfig {
     int screenHeight = 1080;
 
     // Crosshair position (usually screen center)
-    cv::Point2f crosshairPos{960.0f, 540.0f};
+    Vec2 crosshairPos{960.0f, 540.0f};
 };
 
 /**

@@ -22,8 +22,8 @@ void TrajectoryPlanner::reset() {
     filterY_.reset();
 }
 
-MouseMovement TrajectoryPlanner::plan(const cv::Point2f& current,
-                                      const cv::Point2f& target) {
+MouseMovement TrajectoryPlanner::plan(const Vec2& current,
+                                      const Vec2& target) {
     // Update time delta
     auto now = std::chrono::steady_clock::now();
     float dt = std::chrono::duration<float>(now - lastTime_).count();
@@ -65,12 +65,12 @@ MouseMovement TrajectoryPlanner::plan(const cv::Point2f& current,
 }
 
 MouseMovement TrajectoryPlanner::planWithPrediction(
-    const cv::Point2f& current,
-    const cv::Point2f& predicted,
+    const Vec2& current,
+    const Vec2& predicted,
     float confidence) {
 
     // Blend between current and predicted based on confidence
-    cv::Point2f target;
+    Vec2 target;
     target.x = current.x + (predicted.x - current.x) * confidence;
     target.y = current.y + (predicted.y - current.y) * confidence;
 
@@ -81,11 +81,11 @@ MouseMovement TrajectoryPlanner::planWithPrediction(
 // Bezier Implementation
 // --------------------------------------------------------------------------
 
-MouseMovement TrajectoryPlanner::advanceBezier(const cv::Point2f& current,
-                                               const cv::Point2f& target,
+MouseMovement TrajectoryPlanner::advanceBezier(const Vec2& current,
+                                               const Vec2& target,
                                                float dt) {
     // 1. Detect if we need a new curve
-    float distToLastTarget = cv::norm(target - lastTarget_);
+    float distToLastTarget = (target - lastTarget_).length();
     bool isNewTarget = distToLastTarget > 50.0f && hasActivePath_;
 
     if (!hasActivePath_ || isNewTarget) {
@@ -101,19 +101,19 @@ MouseMovement TrajectoryPlanner::advanceBezier(const cv::Point2f& current,
     // Step size is now derived from dt and duration
     // stepSize_ stored 1/duration. So t += dt * stepSize_
     t_ += dt * stepSize_;
-    
+
     if (t_ > 1.0f) t_ = 1.0f;
 
     // 3. Calculate next position on curve
-    cv::Point2f nextPos = activeCurve_.at(t_);
+    Vec2 nextPos = activeCurve_.at(t_);
 
     // 4. Calculate delta needed from CURRENT actual position
     float dx = nextPos.x - current.x;
     float dy = nextPos.y - current.y;
-    
+
     // Estimate velocity for next frame (pixels/sec)
     if (dt > 0.0001f) {
-        currentVelocity_ = cv::Point2f(dx / dt, dy / dt);
+        currentVelocity_ = Vec2(dx / dt, dy / dt);
     }
 
     // Check if we reached the end
@@ -127,12 +127,12 @@ MouseMovement TrajectoryPlanner::advanceBezier(const cv::Point2f& current,
     return screenToMouse(dx, dy);
 }
 
-void TrajectoryPlanner::generateNewCurve(const cv::Point2f& start, const cv::Point2f& end) {
+void TrajectoryPlanner::generateNewCurve(const Vec2& start, const Vec2& end) {
     activeCurve_.p0 = start;
     activeCurve_.p3 = end;
 
-    float dist = cv::norm(end - start);
-    
+    float dist = (end - start).length();
+
     // Randomizers
     std::uniform_real_distribution<float> curvDist(0.1f, config_.bezierCurvature);
     std::uniform_real_distribution<float> timeDist(config_.minPathDuration, config_.maxPathDuration);
@@ -142,40 +142,40 @@ void TrajectoryPlanner::generateNewCurve(const cv::Point2f& start, const cv::Poi
     // P1: Initial Control Point (Departure)
     // Should align with current velocity to be smooth, or random if stationary
     // -----------------------------------------------------------------
-    cv::Point2f p1Dir;
-    float velocityMag = cv::norm(currentVelocity_);
-    
+    Vec2 p1Dir;
+    float velocityMag = currentVelocity_.length();
+
     // Heuristic: If moving fast enough (> 100px/s), use velocity momentum
     if (velocityMag > 100.0f) {
         p1Dir = currentVelocity_ / velocityMag;
     } else {
         // Otherwise, use direction to target + random noise
-        cv::Point2f dir = end - start;
-        float dirLen = cv::norm(dir);
+        Vec2 dir = end - start;
+        float dirLen = dir.length();
         if (dirLen > 0.001f) p1Dir = dir / dirLen;
-        
+
         // Add perpendicular noise
-        cv::Point2f perp(-p1Dir.y, p1Dir.x);
+        Vec2 perp(-p1Dir.y, p1Dir.x);
         float noise = (sideDist(rng_) ? 1.0f : -1.0f) * curvDist(rng_);
-        p1Dir += perp * noise;
+        p1Dir = p1Dir + perp * noise;
     }
-    
+
     // Place P1 at ~25-40% of distance
-    float p1Dist = dist * 0.33f; 
+    float p1Dist = dist * 0.33f;
     activeCurve_.p1 = start + p1Dir * p1Dist;
 
     // -----------------------------------------------------------------
     // P2: Final Control Point (Arrival)
     // Should align with approach to target to avoid overshooting
     // -----------------------------------------------------------------
-    cv::Point2f dirToEnd = end - start;
-    float dirLen = cv::norm(dirToEnd);
-    if (dirLen > 0.001f) dirToEnd /= dirLen;
-    
+    Vec2 dirToEnd = end - start;
+    float dirLen = dirToEnd.length();
+    if (dirLen > 0.001f) dirToEnd = dirToEnd / dirLen;
+
     // Add some random arc to the approach
-    cv::Point2f perp(-dirToEnd.y, dirToEnd.x);
+    Vec2 perp(-dirToEnd.y, dirToEnd.x);
     float noise2 = (sideDist(rng_) ? 1.0f : -1.0f) * curvDist(rng_);
-    
+
     // P2 is "behind" P3, so we subtract from P3
     // Standard cubic bezier heuristic: P2 is at ~66% of way, or P3 - vector
     activeCurve_.p2 = end - (dirToEnd + perp * noise2) * (dist * 0.33f);
@@ -194,30 +194,30 @@ void TrajectoryPlanner::generateNewCurve(const cv::Point2f& start, const cv::Poi
     hasActivePath_ = true;
 }
 
-void TrajectoryPlanner::updateCurveEnd(const cv::Point2f& current, const cv::Point2f& newEnd) {
+void TrajectoryPlanner::updateCurveEnd(const Vec2& current, const Vec2& newEnd) {
     // "Drag" the curve: Move P3 to new location
     // Recalculate P2 to maintain the "approach angle" relative to the new P3
-    
+
     // 1. Update Endpoint
     activeCurve_.p3 = newEnd;
-    
+
     // 2. Recalculate P2
     // We want P2 to maintain its relative "shape" with respect to P3 and P0
     // Simple heuristic: P2 is usually P3 - (Direction * scale)
     // We can just keep the original "offset" of P2 relative to P3, but rotated?
     // Simpler: Just re-interpolate P2 between P0 and P3
-    
-    cv::Point2f dir = newEnd - activeCurve_.p0;
-    float dist = cv::norm(dir);
-    if (dist > 0.001f) dir /= dist;
-    
+
+    Vec2 dir = newEnd - activeCurve_.p0;
+    float dist = dir.length();
+    if (dist > 0.001f) dir = dir / dist;
+
     // Preserve the "curvature" factor we picked during generation
     // But for tracking, stability is better.
     // Let's just linearly interpolate P2 towards the new ideal P2 position
     // New Ideal P2 = newEnd - (dir * 0.33 * dist)
-    
-    cv::Point2f idealP2 = newEnd - (dir * (dist * 0.33f));
-    
+
+    Vec2 idealP2 = newEnd - (dir * (dist * 0.33f));
+
     // Blend current P2 with Ideal P2 to avoid snaps
     activeCurve_.p2 = activeCurve_.p2 * 0.8f + idealP2 * 0.2f;
 }

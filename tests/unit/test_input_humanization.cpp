@@ -166,7 +166,7 @@ TEST_CASE("Humanizer tremor disabled returns original movement", "[input][humani
 
     Humanizer humanizer(config);
 
-    cv::Point2f movement{10.0f, 5.0f};
+    Vec2 movement{10.0f, 5.0f};
     auto result = humanizer.applyTremor(movement, 0.016f);
 
     REQUIRE_THAT(result.x, WithinAbs(10.0f, 0.01f));
@@ -181,7 +181,7 @@ TEST_CASE("Humanizer tremor applies sinusoidal jitter", "[input][humanizer]") {
 
     Humanizer humanizer(config);
 
-    cv::Point2f movement{10.0f, 5.0f};
+    Vec2 movement{10.0f, 5.0f};
 
     // First call (phase = 0)
     auto result1 = humanizer.applyTremor(movement, 0.016f);
@@ -207,7 +207,7 @@ TEST_CASE("Humanizer tremor amplitude within bounds", "[input][humanizer]") {
 
     Humanizer humanizer(config);
 
-    cv::Point2f movement{10.0f, 5.0f};
+    Vec2 movement{10.0f, 5.0f};
 
     // Sample over 100 frames (1.6 seconds at 60fps)
     for (int i = 0; i < 100; ++i) {
@@ -230,7 +230,7 @@ TEST_CASE("Humanizer tremor phase wrapping", "[input][humanizer]") {
 
     Humanizer humanizer(config);
 
-    cv::Point2f movement{10.0f, 5.0f};
+    Vec2 movement{10.0f, 5.0f};
 
     // Advance phase beyond 2π multiple times
     // Phase should wrap to prevent overflow
@@ -250,7 +250,7 @@ TEST_CASE("Humanizer tremor reset phase", "[input][humanizer]") {
 
     Humanizer humanizer(config);
 
-    cv::Point2f movement{10.0f, 5.0f};
+    Vec2 movement{10.0f, 5.0f};
 
     // Advance phase significantly
     for (int i = 0; i < 10; ++i) {

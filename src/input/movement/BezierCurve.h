@@ -1,11 +1,11 @@
 #pragma once
-#include <opencv2/core/types.hpp>
+#include "core/entities/MathTypes.h"
 #include <cmath>
 
 namespace macroman {
 
 struct BezierCurve {
-    cv::Point2f p0, p1, p2, p3;
+    Vec2 p0, p1, p2, p3;
     float overshootFactor = 0.15f;  // 15% overshoot for humanization
 
     /**
@@ -19,7 +19,7 @@ struct BezierCurve {
      *
      * @param t Progress along curve. Values > 1.15 are clamped to 1.15.
      */
-    cv::Point2f at(float t) const {
+    Vec2 at(float t) const {
         // Clamp lower bound
         if (t < 0.0f) t = 0.0f;
 
@@ -42,9 +42,9 @@ struct BezierCurve {
      */
     float length() const {
         // Chord lengths approximation
-        float l1 = cv::norm(p1 - p0);
-        float l2 = cv::norm(p2 - p1);
-        float l3 = cv::norm(p3 - p2);
+        float l1 = (p1 - p0).length();
+        float l2 = (p2 - p1).length();
+        float l3 = (p3 - p2).length();
         return l1 + l2 + l3;
     }
 
@@ -52,14 +52,14 @@ private:
     /**
      * @brief Standard cubic Bezier evaluation using Bernstein polynomials
      */
-    cv::Point2f evaluateBezier(float t) const {
+    Vec2 evaluateBezier(float t) const {
         float u = 1.0f - t;
         float tt = t * t;
         float uu = u * u;
         float uuu = uu * u;
         float ttt = tt * t;
 
-        cv::Point2f p;
+        Vec2 p;
         p.x = uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x;
         p.y = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y;
         return p;
@@ -72,20 +72,20 @@ private:
      * At t=1.075: at overshoot peak (p3 + 15% in direction of movement)
      * At t=1.15: back at target (p3) - correction complete
      */
-    cv::Point2f evaluateOvershoot(float t) const {
+    Vec2 evaluateOvershoot(float t) const {
         // Calculate overshoot direction (direction from p2 to p3)
-        cv::Point2f direction = p3 - p2;
-        float dirLength = cv::norm(direction);
+        Vec2 direction = p3 - p2;
+        float dirLength = direction.length();
 
         if (dirLength < 0.001f) {
             // No movement, just return target
             return p3;
         }
 
-        direction /= dirLength;  // Normalize
+        direction = direction / dirLength;  // Normalize
 
         // Calculate overshoot target (15% past p3)
-        cv::Point2f overshootTarget = p3 + direction * (dirLength * overshootFactor);
+        Vec2 overshootTarget = p3 + direction * (dirLength * overshootFactor);
 
         // Map t ∈ [1.0, 1.15] to overshoot progress
         // t=1.0 → 0.0 (at p3)

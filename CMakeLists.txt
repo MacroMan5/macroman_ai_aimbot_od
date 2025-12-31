@@ -117,6 +117,13 @@ set_target_properties(onnxruntime PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${ONNXRUNTIME_ROOT}/build/native/include"
 )
 
+# 10. TensorRT (NVIDIA-only, conditional)
+if(ENABLE_TENSORRT)
+    find_package(CUDAToolkit 12.0 REQUIRED)
+    find_package(TensorRT REQUIRED)
+    message(STATUS "TensorRT enabled: ${TensorRT_VERSION}")
+endif()
+
 # Global include directory
 include_directories("${CMAKE_SOURCE_DIR}/src")
 

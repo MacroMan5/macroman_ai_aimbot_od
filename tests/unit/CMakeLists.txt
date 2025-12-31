@@ -24,7 +24,6 @@ target_link_libraries(unit_tests PRIVATE
     macroman_tracking
     macroman_input
     Catch2::Catch2WithMain
-    opencv_world
     d3d11.lib
     dxgi.lib
 )
@@ -35,7 +34,6 @@ target_include_directories(unit_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/detection
     ${CMAKE_SOURCE_DIR}/src/input
-    ${OpenCV_INCLUDE_DIRS}
 )
 
 # Add to CTest

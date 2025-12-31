@@ -25,12 +25,10 @@ add_library(macroman_input STATIC
     ${HEADERS}
 )
 
-target_link_libraries(macroman_input PUBLIC 
-    macroman_core 
-    opencv_world
+target_link_libraries(macroman_input PUBLIC
+    macroman_core
 )
 
 target_include_directories(macroman_input PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${OpenCV_INCLUDE_DIRS}
 )

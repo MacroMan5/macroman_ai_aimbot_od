@@ -1,6 +1,6 @@
 #pragma once
 
-#include <opencv2/core/types.hpp>
+#include "core/entities/MathTypes.h"
 #include <random>
 #include <chrono>
 
@@ -55,7 +55,7 @@ public:
      * @param dt Time delta since last update (for tremor phase calculation)
      * @return Movement with tremor applied
      */
-    cv::Point2f applyTremor(const cv::Point2f& movement, float dt);
+    Vec2 applyTremor(const Vec2& movement, float dt);
 
     /**
      * @brief Resets tremor phase (call when aim key is released or target lost)
