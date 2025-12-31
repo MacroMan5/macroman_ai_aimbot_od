@@ -75,7 +75,9 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG v1.91.2
 )
-FetchContent_MakeAvailable(imgui)
+# Use Populate instead of MakeAvailable since ImGui has no CMakeLists.txt
+FetchContent_Populate(imgui)
+FetchContent_GetProperties(imgui)
 
 # ImGui doesn't provide CMakeLists.txt, so we build it manually
 set(IMGUI_SOURCES
