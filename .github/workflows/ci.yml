@@ -111,7 +111,8 @@ jobs:
         run: |
           Write-Host "Configuring with ONNX Runtime at: $env:ONNXRUNTIME_ROOT"
 
-          cmake -B build -S . --preset=x64-release `
+          cmake -B build -S . -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=Release `
             -DONNXRUNTIME_ROOT="$env:ONNXRUNTIME_ROOT" `
             -DENABLE_TESTS=ON `
             -DENABLE_BENCHMARKS=ON `
