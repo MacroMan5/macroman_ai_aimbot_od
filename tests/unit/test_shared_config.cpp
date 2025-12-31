@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include "config/SharedConfig.h"
+#include "config/SharedConfigManager.h"
 
 using namespace macroman;
 
@@ -138,5 +139,146 @@ TEST_CASE("SharedConfig - Alignment verification", "[config][ipc]") {
     SECTION("Size is reasonable (< 2KB)") {
         // SharedConfig should fit in a few cache lines
         REQUIRE(sizeof(SharedConfig) < 2048);
+    }
+}
+
+// ============================================================================
+// SharedConfigManager Tests (Windows IPC)
+// ============================================================================
+
+TEST_CASE("SharedConfigManager - Engine creates mapping", "[config][ipc][manager]") {
+    SharedConfigManager manager;
+
+    SECTION("Create mapping succeeds") {
+        bool success = manager.createMapping("MacromanAimbot_Test_Create");
+        REQUIRE(success == true);
+        REQUIRE(manager.isActive() == true);
+        REQUIRE(manager.getConfig() != nullptr);
+
+        // Verify default initialization
+        auto* config = manager.getConfig();
+        REQUIRE(config->aimSmoothness.load() == 0.5f);
+        REQUIRE(config->fov.load() == 80.0f);
+        REQUIRE(config->activeProfileId.load() == 0);
+
+        manager.close();
+    }
+
+    SECTION("Create fails if already active") {
+        manager.createMapping("MacromanAimbot_Test_DoubleCreate");
+        REQUIRE(manager.isActive() == true);
+
+        // Second create should fail
+        bool success = manager.createMapping("MacromanAimbot_Test_DoubleCreate2");
+        REQUIRE(success == false);
+        REQUIRE(manager.getLastError().find("already active") != std::string::npos);
+
+        manager.close();
+    }
+
+    SECTION("RAII cleanup") {
+        {
+            SharedConfigManager tempManager;
+            tempManager.createMapping("MacromanAimbot_Test_RAII");
+            REQUIRE(tempManager.isActive() == true);
+            // Destructor should automatically close
+        }
+        // Manager is destroyed, mapping should be closed
+    }
+}
+
+TEST_CASE("SharedConfigManager - Config UI opens mapping", "[config][ipc][manager]") {
+    SharedConfigManager engineManager;
+    SharedConfigManager uiManager;
+
+    SECTION("Open existing mapping succeeds") {
+        // Engine creates mapping
+        bool created = engineManager.createMapping("MacromanAimbot_Test_Open");
+        REQUIRE(created == true);
+
+        // Config UI opens existing mapping
+        bool opened = uiManager.openMapping("MacromanAimbot_Test_Open");
+        REQUIRE(opened == true);
+        REQUIRE(uiManager.isActive() == true);
+        REQUIRE(uiManager.getConfig() != nullptr);
+
+        engineManager.close();
+        uiManager.close();
+    }
+
+    SECTION("Open fails if mapping doesn't exist") {
+        bool success = uiManager.openMapping("MacromanAimbot_Test_NonExistent");
+        REQUIRE(success == false);
+        REQUIRE(uiManager.isActive() == false);
+        REQUIRE(uiManager.getConfig() == nullptr);
+        REQUIRE(uiManager.getLastError().find("is Engine running?") != std::string::npos);
+    }
+}
+
+TEST_CASE("SharedConfigManager - IPC communication", "[config][ipc][manager]") {
+    SharedConfigManager engineManager;
+    SharedConfigManager uiManager;
+
+    // Engine creates, UI opens
+    engineManager.createMapping("MacromanAimbot_Test_IPC");
+    uiManager.openMapping("MacromanAimbot_Test_IPC");
+
+    SECTION("Both processes access same memory") {
+        auto* engineConfig = engineManager.getConfig();
+        auto* uiConfig = uiManager.getConfig();
+
+        // Engine writes
+        engineConfig->aimSmoothness.store(0.7f, std::memory_order_relaxed);
+        engineConfig->fov.store(90.0f, std::memory_order_relaxed);
+        engineConfig->activeTargets.store(5, std::memory_order_relaxed);
+
+        // UI reads same values (shared memory)
+        REQUIRE(uiConfig->aimSmoothness.load(std::memory_order_relaxed) == 0.7f);
+        REQUIRE(uiConfig->fov.load(std::memory_order_relaxed) == 90.0f);
+        REQUIRE(uiConfig->activeTargets.load(std::memory_order_relaxed) == 5);
+    }
+
+    SECTION("UI writes, Engine reads") {
+        auto* engineConfig = engineManager.getConfig();
+        auto* uiConfig = uiManager.getConfig();
+
+        // UI writes (user adjusts slider)
+        uiConfig->aimSmoothness.store(0.3f, std::memory_order_relaxed);
+        uiConfig->enablePrediction.store(false, std::memory_order_relaxed);
+
+        // Engine reads updated values
+        REQUIRE(engineConfig->aimSmoothness.load(std::memory_order_relaxed) == 0.3f);
+        REQUIRE(engineConfig->enablePrediction.load(std::memory_order_relaxed) == false);
+    }
+
+    engineManager.close();
+    uiManager.close();
+}
+
+TEST_CASE("SharedConfigManager - Close behavior", "[config][ipc][manager]") {
+    SharedConfigManager manager;
+
+    SECTION("Close is idempotent (safe to call multiple times)") {
+        manager.createMapping("MacromanAimbot_Test_Close");
+        REQUIRE(manager.isActive() == true);
+
+        manager.close();
+        REQUIRE(manager.isActive() == false);
+        REQUIRE(manager.getConfig() == nullptr);
+
+        // Second close should not crash
+        manager.close();
+        REQUIRE(manager.isActive() == false);
+    }
+
+    SECTION("Can reopen after close") {
+        manager.createMapping("MacromanAimbot_Test_Reopen");
+        manager.close();
+
+        bool success = manager.createMapping("MacromanAimbot_Test_Reopen2");
+        REQUIRE(success == true);
+        REQUIRE(manager.isActive() == true);
+
+        manager.close();
     }
 }

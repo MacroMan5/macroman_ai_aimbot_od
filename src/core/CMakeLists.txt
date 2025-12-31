@@ -28,6 +28,7 @@ add_library(macroman_core
     config/ProfileManager.cpp
     config/GameDetector.cpp
     config/ModelManager.cpp
+    config/SharedConfigManager.cpp
 )
 
 target_include_directories(macroman_core PUBLIC
