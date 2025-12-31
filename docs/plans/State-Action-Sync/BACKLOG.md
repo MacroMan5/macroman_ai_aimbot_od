@@ -60,14 +60,26 @@ This backlog tracks granular tasks across all development phases.
 ## Phase 5: Configuration & Auto-Detection ⚪
 - [ ] Implement Game Profile JSON system
 - [ ] Implement `GameDetector` (Auto-detection with hysteresis)
-- [ ] Implement `SharedConfig` (Memory-mapped IPC for live tuning)
+- [ ] Implement `SharedConfig` (Memory-mapped IPC for live tuning) - **Note:** Base implementation exists in src/core/config/
+- [ ] Implement `SharedConfigManager` (Windows memory-mapped file wrapper)
 - [ ] Implement ModelManager (Thread-safe model switching)
+- [ ] Unit tests for config components
 
-## Phase 6: Safety & Humanization ⚪
-- [ ] Reaction Delay Manager (Simulate human reaction time)
-- [ ] Micro-Tremor/Jitter Simulator
-- [ ] Bezier Overshoot & Correction logic
-- [ ] SetWindowDisplayAffinity (Screenshot protection)
+## Phase 6: UI & Observability ✅ **COMPLETE**
+- [x] In-game overlay (ImGui transparent window - 800x600, frameless)
+- [x] Performance metrics display (FPS, latency breakdown, VRAM usage)
+- [x] Bounding box visualization (color-coded by hitbox type + selected target)
+- [x] Component toggles (enable/disable tracking, prediction, aiming, tremor via SharedConfig)
+- [x] SetWindowDisplayAffinity screenshot protection (WDA_EXCLUDEFROMCAPTURE)
+- [x] Safety metrics panel (Critical Traps monitoring)
+- [x] External config UI (macroman_config.exe standalone ImGui app, 1200x800)
+- [x] Live tuning sliders (smoothness, FOV via SharedConfig IPC)
+- [x] Telemetry dashboard (real-time metrics from SharedConfig)
+- [x] FrameProfiler implementation (300-sample ring buffer, latency graphs)
+- [x] BottleneckDetector (stage-specific performance suggestions integrated into FrameProfiler)
+- [x] Build system integration (CMakeLists.txt for ui/ and config_app/)
+- [ ] Unit tests for UI components (pending - requires Engine integration for ImGui context)
+- [ ] Verify overlay doesn't impact game performance (<1ms overhead - requires full Engine integration)
 
 ## Phase 7: Testing & Benchmarking ⚪
 - [ ] Complete unit test coverage for algorithms
@@ -88,15 +100,29 @@ This backlog tracks granular tasks across all development phases.
 - [ ] User Setup & Calibration Guide
 - [ ] Safety, Ethics, & Humanization Manual
 
-## Phase 10: UI & Observability ⚪
-- [ ] ImGui Debug Overlay (Metrics + BBoxes)
-- [ ] Standalone Config UI Application
-- [ ] FrameProfiler (Latency Graphs)
-- [ ] Lock-free Telemetry System
-
 ---
 
 ## ✅ Completed Tasks
+- [2025-12-31] **Phase 6 UI & Observability Complete** (Commits: TBD)
+  - DebugOverlay implementation (800x600 transparent ImGui window)
+  - Performance metrics panel (FPS, latency breakdown, VRAM usage with color coding)
+  - Bounding box visualization (colored by hitbox: RED=head, ORANGE=chest, YELLOW=body, GREEN=selected)
+  - Component toggles panel (runtime enable/disable for tracking, prediction, aiming, tremor)
+  - SetWindowDisplayAffinity screenshot protection (WDA_EXCLUDEFROMCAPTURE for Windows 10 1903+)
+  - Safety metrics panel (Critical Traps monitoring: texture pool starvation, stale predictions, deadman switch)
+  - FrameProfiler implementation (300-sample ring buffer history, 5 seconds @ 60fps UI refresh)
+  - Latency graphs (4 line graphs: capture, detection, tracking, input with P95 thresholds)
+  - Bottleneck detection with stage-specific suggestions (Detection→reduce input size/TensorRT, Capture→GPU busy/reduce graphics, etc.)
+  - External Config UI (macroman_config.exe - 1200x800 standalone ImGui application)
+  - Live tuning sliders (smoothness 0.0-1.0, FOV 10-180 degrees via SharedConfig IPC)
+  - Telemetry dashboard (real-time metrics from SharedConfig atomics)
+  - Component toggles in config UI (read/write SharedConfig atomics for enable flags)
+  - Build system integration (src/ui/CMakeLists.txt, src/ui/config_app/CMakeLists.txt with GLOB_RECURSE)
+  - Fixed namespace closure bug in ConfigApp.cpp (WndProc in global namespace)
+  - Fixed HISTORY_SIZE declaration order in FrameProfiler.h (static constexpr moved to public section)
+  - Unit tests: Pending (requires Engine integration for ImGui context)
+  - Performance verification: Pending (requires full Engine integration)
+  - Completion report: TBD (will be created before PR merge)
 - [2025-12-30] **Phase 4 Input & Aiming 100% Complete** (Commits: 5f7e6d4 through bac78c3)
   - InputManager with 1000Hz loop orchestration (actual: 800-1200Hz with timing variance)
   - Win32Driver using SendInput API (<1ms latency)
