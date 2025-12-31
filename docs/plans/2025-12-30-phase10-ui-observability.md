@@ -2058,7 +2058,7 @@ ctest --test-dir build --output-on-failure
 **Tasks:**
 1. Complete unit test coverage for algorithms
 2. Integration tests with golden datasets
-3. CLI benchmark tool (`sunone-bench.exe`)
+3. CLI benchmark tool (`macroman-bench.exe`)
 4. Record test datasets (500 frames per game)
 5. CI/CD pipeline (GitHub Actions)
 6. Performance regression tests

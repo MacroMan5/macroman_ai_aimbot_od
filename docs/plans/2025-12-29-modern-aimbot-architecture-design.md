@@ -972,11 +972,11 @@ TEST_CASE("Full Pipeline with Golden Dataset", "[integration]") {
 }
 ```
 
-**3. CLI Benchmark Tool (`sunone-bench.exe`)**
+**3. CLI Benchmark Tool (`macroman-bench.exe`)**
 
 Headless performance regression testing for CI/CD:
 ```bash
-sunone-bench.exe \
+macroman-bench.exe \
   --dataset test_data/valorant_golden.frames \
   --model models/valorant_yolov8.onnx \
   --threshold-avg-fps 120 \
@@ -1000,7 +1000,7 @@ sunone-bench.exe \
 # .github/workflows/performance-regression.yml
 - name: Run Performance Benchmark
   run: |
-    sunone-bench.exe \
+    macroman-bench.exe \
       --dataset test_data/valorant_500frames.bin \
       --model models/valorant_yolov8.onnx \
       --threshold-avg-fps 120 \
@@ -2007,7 +2007,7 @@ void inputLoop() {
 
 - [ ] Complete unit test coverage for algorithms
 - [ ] Integration tests with golden datasets
-- [ ] CLI benchmark tool (`sunone-bench.exe`)
+- [ ] CLI benchmark tool (`macroman-bench.exe`)
 - [ ] Record test datasets (500 frames per game)
 - [ ] CI/CD pipeline (GitHub Actions)
 - [ ] Performance regression tests
@@ -2196,7 +2196,7 @@ macroman_ai_aimbot/
 │   ├── integration/
 │   │   └── test_pipeline.cpp
 │   └── benchmark/
-│       └── sunone-bench.cpp    # CLI benchmark tool
+│       └── macroman-bench.cpp    # CLI benchmark tool
 │
 ├── test_data/                  # Golden datasets
 │   ├── valorant_500frames.bin

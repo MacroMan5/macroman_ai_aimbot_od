@@ -19,6 +19,12 @@ add_executable(unit_tests
     test_game_detector.cpp
     test_shared_config.cpp
     test_debug_overlay.cpp
+    test_bezier_curve.cpp
+    test_fake_screen_capture.cpp
+    test_fake_detector.cpp
+    test_performance_metrics.cpp
+    ../helpers/FakeScreenCapture.cpp
+    ../helpers/FakeDetector.cpp
 )
 
 # Link libraries
@@ -41,9 +47,18 @@ target_include_directories(unit_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/detection
     ${CMAKE_SOURCE_DIR}/src/input
     ${CMAKE_SOURCE_DIR}/src/ui
+    ${CMAKE_SOURCE_DIR}/tests
 )
 
 # Add to CTest
 include(CTest)
 include(Catch)
 catch_discover_tests(unit_tests)
+
+# Code coverage target (if enabled)
+if(ENABLE_COVERAGE AND COMMAND add_code_coverage_target)
+    add_code_coverage_target(
+        TARGET unit_tests
+        OUTPUT_DIR "${CMAKE_BINARY_DIR}/coverage/unit"
+    )
+endif()

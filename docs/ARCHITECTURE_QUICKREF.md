@@ -60,4 +60,4 @@ Code in `Capture`, `Detection`, and `Input` threads must adhere to:
 ## 5. Build & Test
 *   **Build:** `cmake --build build`
 *   **Test:** `ctest --test-dir build`
-*   **Bench:** `sunone-bench.exe` (Post-build)
+*   **Bench:** `macroman-bench.exe` (Post-build)

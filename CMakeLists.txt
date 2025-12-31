@@ -8,6 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # --- Options ---
 option(BUILD_TESTS "Build unit tests" ON)
 option(ENABLE_TENSORRT "Enable TensorRT backend" ON)
+option(ENABLE_COVERAGE "Enable code coverage reporting (requires OpenCppCoverage on Windows)" OFF)
+
+# --- Code Coverage ---
+if(BUILD_TESTS)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+    include(CodeCoverage)
+endif()
 
 # --- Output Directories ---
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -152,6 +159,9 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# --- Tools ---
+add_subdirectory(tools)
 
 # --- Assets Copy ---
 add_custom_target(CopyAssets ALL
