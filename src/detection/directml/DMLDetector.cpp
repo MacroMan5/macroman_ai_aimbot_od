@@ -163,7 +163,7 @@ bool DMLDetector::compileComputeShader() {
     HRESULT hr = D3DCompile(
         shaderSource.c_str(), shaderSource.length(),
         nullptr, nullptr, nullptr,
-        "main", "cs_5_0",
+        "CSMain", "cs_5_0",  // Entry point must match shader function name
         D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3, 0,
         blob.GetAddressOf(), errorBlob.GetAddressOf()
     );
