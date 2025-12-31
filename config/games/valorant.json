@@ -1,0 +1,26 @@
+{
+  "gameId": "valorant",
+  "displayName": "Valorant",
+  "processNames": ["VALORANT.exe", "VALORANT-Win64-Shipping.exe"],
+  "windowTitles": ["VALORANT"],
+
+  "detection": {
+    "modelPath": "models/valorant_yolov8_640.onnx",
+    "inputSize": [640, 640],
+    "confidenceThreshold": 0.6,
+    "nmsThreshold": 0.45,
+    "hitboxMapping": {
+      "0": "head",
+      "1": "chest",
+      "2": "body"
+    }
+  },
+
+  "targeting": {
+    "fov": 80.0,
+    "smoothness": 0.65,
+    "predictionStrength": 0.8,
+    "hitboxPriority": ["head", "chest", "body"],
+    "inputLatency": 12.5
+  }
+}
