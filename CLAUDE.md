@@ -164,6 +164,22 @@ cmake --build build --target format
 cmake --build build --target analyze
 ```
 
+### Code Quality
+
+Before committing code:
+
+1. **Format Code**:
+   ```bash
+   clang-format -style=file -i src/**/*.cpp src/**/*.h
+   ```
+
+2. **Check for Issues**:
+   ```bash
+   clang-tidy -p build src/your_file.cpp
+   ```
+
+CI will automatically check formatting and code quality on all PRs. See `docs/CONTRIBUTING.md` for detailed guidelines.
+
 ---
 
 ## 🎨 Code Conventions
