@@ -149,7 +149,7 @@ ctest --test-dir build -C Release
 ./build/bin/unit_tests "[queue]"
 
 # Benchmark with golden dataset
-./build/bin/sunone-bench --model assets/models/sunxds_0.7.3.onnx --dataset test_data/frames.bin
+./build/bin/macroman-bench --model assets/models/sunxds_0.7.3.onnx --dataset test_data/frames.bin
 ```
 
 ### Development

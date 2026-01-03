@@ -26,3 +26,213 @@
 [2025-12-30 14:30:04.825] [warning] [macroman] [thread 31660] TexturePool starved at frame 4 (all 3 textures busy)
 [2025-12-30 14:30:04.826] [info] [macroman] [thread 31660] TexturePool shut down
 [2025-12-30 14:30:04.826] [info] [macroman] [thread 31660] TexturePool shut down
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] Logging system initialized
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] TexturePool shut down
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] TexturePool shut down
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] TexturePool shut down
+[2025-12-31 04:01:44.456] [warning] [macroman] [thread 54728] TexturePool starved at frame 4 (all 3 textures busy)
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] TexturePool shut down
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] TexturePool shut down
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 04:01:44.456] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:44.457] [info] [macroman] [thread 56056] Input loop started (thread ID: 56056)
+[2025-12-31 04:01:44.507] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 56056] Input loop exited
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] InputManager stopped (updates: 5, deadman triggers: 0, movements: 0)
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:44.509] [warning] [macroman] [thread 54728] InputManager already running
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 50940] Input loop started (thread ID: 50940)
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 50940] Input loop exited
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] InputManager stopped (updates: 0, deadman triggers: 0, movements: 0)
+[2025-12-31 04:01:44.509] [error] [macroman] [thread 54728] Mouse driver not connected - cannot start InputManager
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:44.509] [info] [macroman] [thread 54820] Input loop started (thread ID: 54820)
+[2025-12-31 04:01:44.610] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:44.615] [info] [macroman] [thread 54820] Input loop exited
+[2025-12-31 04:01:44.615] [info] [macroman] [thread 54728] InputManager stopped (updates: 10, deadman triggers: 0, movements: 0)
+[2025-12-31 04:01:44.615] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 04:01:44.615] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:44.615] [info] [macroman] [thread 60748] Input loop started (thread ID: 60748)
+[2025-12-31 04:01:44.715] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:44.721] [info] [macroman] [thread 60748] Input loop exited
+[2025-12-31 04:01:44.721] [info] [macroman] [thread 54728] InputManager stopped (updates: 10, deadman triggers: 0, movements: 9)
+[2025-12-31 04:01:44.721] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 04:01:44.721] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:44.721] [info] [macroman] [thread 59440] Input loop started (thread ID: 59440)
+[2025-12-31 04:01:44.823] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:44.828] [info] [macroman] [thread 59440] Input loop exited
+[2025-12-31 04:01:44.828] [info] [macroman] [thread 54728] InputManager stopped (updates: 10, deadman triggers: 0, movements: 4)
+[2025-12-31 04:01:44.828] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 100ms)
+[2025-12-31 04:01:44.828] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:44.828] [info] [macroman] [thread 11876] Input loop started (thread ID: 11876)
+[2025-12-31 04:01:44.930] [warning] [macroman] [thread 11876] Input stale (no new commands for 101ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:44.940] [warning] [macroman] [thread 11876] Input stale (no new commands for 112ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:44.951] [warning] [macroman] [thread 11876] Input stale (no new commands for 123ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:44.962] [warning] [macroman] [thread 11876] Input stale (no new commands for 133ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:44.975] [warning] [macroman] [thread 11876] Input stale (no new commands for 146ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:44.987] [warning] [macroman] [thread 11876] Input stale (no new commands for 159ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:44.999] [warning] [macroman] [thread 11876] Input stale (no new commands for 170ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:45.010] [warning] [macroman] [thread 11876] Input stale (no new commands for 182ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:45.021] [warning] [macroman] [thread 11876] Input stale (no new commands for 192ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 04:01:45.028] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:45.032] [info] [macroman] [thread 11876] Input loop exited
+[2025-12-31 04:01:45.032] [info] [macroman] [thread 54728] InputManager stopped (updates: 18, deadman triggers: 9, movements: 3)
+[2025-12-31 04:01:45.032] [info] [macroman] [thread 54728] Starting InputManager (target: 1000Hz, deadman: 200ms)
+[2025-12-31 04:01:45.032] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:45.032] [info] [macroman] [thread 61872] Input loop started (thread ID: 61872)
+[2025-12-31 04:01:45.232] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:45.233] [info] [macroman] [thread 61872] Input loop exited
+[2025-12-31 04:01:45.233] [info] [macroman] [thread 54728] InputManager stopped (updates: 105, deadman triggers: 0, movements: 57)
+[2025-12-31 04:01:45.233] [info] [macroman] [thread 54728] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 04:01:45.233] [info] [macroman] [thread 54728] Input thread priority set to HIGHEST
+[2025-12-31 04:01:45.234] [info] [macroman] [thread 30612] Input loop started (thread ID: 30612)
+[2025-12-31 04:01:45.434] [info] [macroman] [thread 54728] Stopping InputManager...
+[2025-12-31 04:01:45.437] [info] [macroman] [thread 30612] Input loop exited
+[2025-12-31 04:01:45.437] [info] [macroman] [thread 54728] InputManager stopped (updates: 18, deadman triggers: 0, movements: 11)
+[2025-12-31 04:01:45.438] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'test_game' from C:\Users\therouxe\AppData\Local\Temp\test_profile_41.json
+[2025-12-31 04:01:45.439] [error] [macroman] [thread 54728] ProfileManager: Failed to load C:\Users\therouxe\AppData\Local\Temp\test_profile_18467.json: JSON parse error: [json.exception.out_of_range.403] key 'gameId' not found
+[2025-12-31 04:01:45.440] [error] [macroman] [thread 54728] ProfileManager: confidenceThreshold must be in [0.0, 1.0]
+[2025-12-31 04:01:45.441] [error] [macroman] [thread 54728] ProfileManager: Failed to load C:\Users\therouxe\AppData\Local\Temp\test_profile_26500.json: JSON parse error: [json.exception.parse_error.101] parse error at line 4, column 13: syntax error while parsing object key - invalid literal; last read: '"Test",<U+000A>            /'; expected string literal
+[2025-12-31 04:01:45.441] [error] [macroman] [thread 54728] ProfileManager: File not found: nonexistent_file.json
+[2025-12-31 04:01:45.442] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_19169.json
+[2025-12-31 04:01:45.443] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_15724.json
+[2025-12-31 04:01:45.444] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_11478.json
+[2025-12-31 04:01:45.445] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_29358.json
+[2025-12-31 04:01:45.445] [error] [macroman] [thread 54728] GameDetector: ProfileManager not set
+[2025-12-31 04:01:45.452] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'test_game' from C:\Users\therouxe\AppData\Local\Temp\test_profile_26962.json
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] ProfileManager: Loaded profile 'test_game' from C:\Users\therouxe\AppData\Local\Temp\test_profile_24464.json
+[2025-12-31 04:01:45.453] [error] [macroman] [thread 54728] GameDetector: ProfileManager not set
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Create' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Create'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_DoubleCreate' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_DoubleCreate'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_RAII' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_RAII'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Open' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Opened mapping 'MacromanAimbot_Test_Open' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Open'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Open'
+[2025-12-31 04:01:45.453] [error] [macroman] [thread 54728] SharedConfigManager: OpenFileMapping failed (error 2) - is Engine running?
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_NonExistent'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Opened mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Opened mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Close' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Close'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Reopen' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Reopen'
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Reopen2' (1216 bytes)
+[2025-12-31 04:01:45.453] [info] [macroman] [thread 54728] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Reopen2'
+[2025-12-31 15:54:04.884] [info] [macroman] [thread 62572] Logging system initialized
+[2025-12-31 15:54:04.884] [info] [macroman] [thread 62572] TexturePool shut down
+[2025-12-31 15:54:04.884] [info] [macroman] [thread 62572] TexturePool shut down
+[2025-12-31 15:54:04.884] [info] [macroman] [thread 62572] TexturePool shut down
+[2025-12-31 15:54:04.884] [warning] [macroman] [thread 62572] TexturePool starved at frame 4 (all 3 textures busy)
+[2025-12-31 15:54:04.888] [info] [macroman] [thread 62572] TexturePool shut down
+[2025-12-31 15:54:04.888] [info] [macroman] [thread 62572] TexturePool shut down
+[2025-12-31 15:54:04.889] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 15:54:04.889] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:04.889] [info] [macroman] [thread 56588] Input loop started (thread ID: 56588)
+[2025-12-31 15:54:04.940] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 56588] Input loop exited
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 62572] InputManager stopped (updates: 5, deadman triggers: 0, movements: 0)
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:04.942] [warning] [macroman] [thread 62572] InputManager already running
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 53096] Input loop started (thread ID: 53096)
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 53096] Input loop exited
+[2025-12-31 15:54:04.942] [info] [macroman] [thread 62572] InputManager stopped (updates: 0, deadman triggers: 0, movements: 0)
+[2025-12-31 15:54:04.942] [error] [macroman] [thread 62572] Mouse driver not connected - cannot start InputManager
+[2025-12-31 15:54:04.943] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 15:54:04.943] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:04.943] [info] [macroman] [thread 61604] Input loop started (thread ID: 61604)
+[2025-12-31 15:54:05.043] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:05.045] [info] [macroman] [thread 61604] Input loop exited
+[2025-12-31 15:54:05.045] [info] [macroman] [thread 62572] InputManager stopped (updates: 9, deadman triggers: 0, movements: 0)
+[2025-12-31 15:54:05.045] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 15:54:05.046] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:05.046] [info] [macroman] [thread 55016] Input loop started (thread ID: 55016)
+[2025-12-31 15:54:05.146] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:05.154] [info] [macroman] [thread 55016] Input loop exited
+[2025-12-31 15:54:05.155] [info] [macroman] [thread 62572] InputManager stopped (updates: 10, deadman triggers: 0, movements: 9)
+[2025-12-31 15:54:05.155] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 15:54:05.155] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:05.155] [info] [macroman] [thread 62276] Input loop started (thread ID: 62276)
+[2025-12-31 15:54:05.256] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:05.262] [info] [macroman] [thread 62276] Input loop exited
+[2025-12-31 15:54:05.262] [info] [macroman] [thread 62572] InputManager stopped (updates: 10, deadman triggers: 0, movements: 4)
+[2025-12-31 15:54:05.263] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 100ms)
+[2025-12-31 15:54:05.263] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:05.263] [info] [macroman] [thread 62684] Input loop started (thread ID: 62684)
+[2025-12-31 15:54:05.366] [warning] [macroman] [thread 62684] Input stale (no new commands for 103ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.378] [warning] [macroman] [thread 62684] Input stale (no new commands for 114ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.387] [warning] [macroman] [thread 62684] Input stale (no new commands for 124ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.398] [warning] [macroman] [thread 62684] Input stale (no new commands for 135ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.408] [warning] [macroman] [thread 62684] Input stale (no new commands for 145ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.420] [warning] [macroman] [thread 62684] Input stale (no new commands for 157ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.432] [warning] [macroman] [thread 62684] Input stale (no new commands for 168ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.444] [warning] [macroman] [thread 62684] Input stale (no new commands for 181ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.455] [warning] [macroman] [thread 62684] Input stale (no new commands for 192ms) - DEADMAN SWITCH ACTIVE
+[2025-12-31 15:54:05.464] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:05.468] [info] [macroman] [thread 62684] Input loop exited
+[2025-12-31 15:54:05.468] [info] [macroman] [thread 62572] InputManager stopped (updates: 19, deadman triggers: 9, movements: 3)
+[2025-12-31 15:54:05.468] [info] [macroman] [thread 62572] Starting InputManager (target: 1000Hz, deadman: 200ms)
+[2025-12-31 15:54:05.468] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:05.468] [info] [macroman] [thread 13620] Input loop started (thread ID: 13620)
+[2025-12-31 15:54:05.669] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:05.670] [info] [macroman] [thread 13620] Input loop exited
+[2025-12-31 15:54:05.670] [info] [macroman] [thread 62572] InputManager stopped (updates: 99, deadman triggers: 0, movements: 64)
+[2025-12-31 15:54:05.670] [info] [macroman] [thread 62572] Starting InputManager (target: 100Hz, deadman: 200ms)
+[2025-12-31 15:54:05.671] [info] [macroman] [thread 62572] Input thread priority set to HIGHEST
+[2025-12-31 15:54:05.671] [info] [macroman] [thread 57208] Input loop started (thread ID: 57208)
+[2025-12-31 15:54:05.872] [info] [macroman] [thread 62572] Stopping InputManager...
+[2025-12-31 15:54:05.873] [info] [macroman] [thread 57208] Input loop exited
+[2025-12-31 15:54:05.873] [info] [macroman] [thread 62572] InputManager stopped (updates: 18, deadman triggers: 0, movements: 10)
+[2025-12-31 15:54:05.886] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'test_game' from C:\Users\therouxe\AppData\Local\Temp\test_profile_41.json
+[2025-12-31 15:54:05.894] [error] [macroman] [thread 62572] ProfileManager: Failed to load C:\Users\therouxe\AppData\Local\Temp\test_profile_18467.json: JSON parse error: [json.exception.out_of_range.403] key 'gameId' not found
+[2025-12-31 15:54:05.904] [error] [macroman] [thread 62572] ProfileManager: confidenceThreshold must be in [0.0, 1.0]
+[2025-12-31 15:54:05.921] [error] [macroman] [thread 62572] ProfileManager: Failed to load C:\Users\therouxe\AppData\Local\Temp\test_profile_26500.json: JSON parse error: [json.exception.parse_error.101] parse error at line 4, column 13: syntax error while parsing object key - invalid literal; last read: '"Test",<U+000A>            /'; expected string literal
+[2025-12-31 15:54:05.922] [error] [macroman] [thread 62572] ProfileManager: File not found: nonexistent_file.json
+[2025-12-31 15:54:05.930] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_19169.json
+[2025-12-31 15:54:05.931] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_15724.json
+[2025-12-31 15:54:05.934] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_11478.json
+[2025-12-31 15:54:05.935] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'valorant' from C:\Users\therouxe\AppData\Local\Temp\test_profile_29358.json
+[2025-12-31 15:54:05.935] [error] [macroman] [thread 62572] GameDetector: ProfileManager not set
+[2025-12-31 15:54:05.944] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'test_game' from C:\Users\therouxe\AppData\Local\Temp\test_profile_26962.json
+[2025-12-31 15:54:05.946] [info] [macroman] [thread 62572] ProfileManager: Loaded profile 'test_game' from C:\Users\therouxe\AppData\Local\Temp\test_profile_24464.json
+[2025-12-31 15:54:05.946] [error] [macroman] [thread 62572] GameDetector: ProfileManager not set
+[2025-12-31 15:54:05.946] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Create' (1216 bytes)
+[2025-12-31 15:54:05.946] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Create'
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_DoubleCreate' (1216 bytes)
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_DoubleCreate'
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_RAII' (1216 bytes)
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_RAII'
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Open' (1216 bytes)
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Opened mapping 'MacromanAimbot_Test_Open' (1216 bytes)
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Open'
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Open'
+[2025-12-31 15:54:05.947] [error] [macroman] [thread 62572] SharedConfigManager: OpenFileMapping failed (error 2) - is Engine running?
+[2025-12-31 15:54:05.947] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_NonExistent'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Opened mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Opened mapping 'MacromanAimbot_Test_IPC' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_IPC'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Close' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Close'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Reopen' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Reopen'
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Created mapping 'MacromanAimbot_Test_Reopen2' (1216 bytes)
+[2025-12-31 15:54:05.948] [info] [macroman] [thread 62572] SharedConfigManager: Closed mapping 'MacromanAimbot_Test_Reopen2'

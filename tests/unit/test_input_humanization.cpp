@@ -109,18 +109,18 @@ TEST_CASE("BezierCurve length estimation", "[input][bezier]") {
 TEST_CASE("Humanizer reaction delay within bounds", "[input][humanizer]") {
     Humanizer::Config config;
     config.enableReactionDelay = true;
-    config.reactionDelayMean = 160.0f;
-    config.reactionDelayStdDev = 25.0f;
-    config.reactionDelayMin = 100.0f;
-    config.reactionDelayMax = 300.0f;
+    config.reactionDelayMean = 12.0f;
+    config.reactionDelayStdDev = 5.0f;
+    config.reactionDelayMin = 5.0f;
+    config.reactionDelayMax = 25.0f;
 
     Humanizer humanizer(config);
 
-    // Sample 100 delays, all should be within [100ms, 300ms]
+    // Sample 100 delays, all should be within [5ms, 25ms]
     for (int i = 0; i < 100; ++i) {
         float delay = humanizer.getReactionDelay();
-        REQUIRE(delay >= 100.0f);
-        REQUIRE(delay <= 300.0f);
+        REQUIRE(delay >= 5.0f);
+        REQUIRE(delay <= 25.0f);
     }
 }
 
@@ -137,10 +137,10 @@ TEST_CASE("Humanizer reaction delay disabled returns zero", "[input][humanizer]"
 TEST_CASE("Humanizer reaction delay statistical properties", "[input][humanizer]") {
     Humanizer::Config config;
     config.enableReactionDelay = true;
-    config.reactionDelayMean = 160.0f;
-    config.reactionDelayStdDev = 25.0f;
-    config.reactionDelayMin = 100.0f;
-    config.reactionDelayMax = 300.0f;
+    config.reactionDelayMean = 12.0f;
+    config.reactionDelayStdDev = 5.0f;
+    config.reactionDelayMin = 5.0f;
+    config.reactionDelayMax = 25.0f;
 
     Humanizer humanizer(config);
 
@@ -152,8 +152,8 @@ TEST_CASE("Humanizer reaction delay statistical properties", "[input][humanizer]
     }
     float mean = sum / N;
 
-    // Mean should be close to 160ms (within 10ms tolerance for statistical variance)
-    REQUIRE_THAT(mean, WithinAbs(160.0f, 10.0f));
+    // Mean should be close to 12ms (within 2ms tolerance for statistical variance)
+    REQUIRE_THAT(mean, WithinAbs(12.0f, 2.0f));
 }
 
 // =============================================================================
@@ -277,7 +277,7 @@ TEST_CASE("Humanizer tremor reset phase", "[input][humanizer]") {
 TEST_CASE("Humanizer config update", "[input][humanizer]") {
     Humanizer::Config config1;
     config1.enableReactionDelay = true;
-    config1.reactionDelayMean = 160.0f;
+    config1.reactionDelayMean = 12.0f;
 
     Humanizer humanizer(config1);
 

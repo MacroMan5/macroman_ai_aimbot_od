@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Texture.h"
+#include "TexturePool.h"  // Required for TextureDeleter::operator() inline definition
 #include <cstdint>
 
 namespace macroman {

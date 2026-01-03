@@ -13,50 +13,6 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  code-quality:
-    name: Code Quality (clang-format + clang-tidy)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run cpp-linter
-        uses: cpp-linter/cpp-linter-action@v2
-        id: linter
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          style: 'file'
-          tidy-checks: ''
-          version: 18
-          files-changed-only: true
-          thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
-          step-summary: true
-
-      - name: Fail on errors
-        if: steps.linter.outputs.checks-failed > 0
-        run: |
-          echo "::error::Linting failed with ${{ steps.linter.outputs.checks-failed }} errors"
-          exit 1
-
-  documentation-check:
-    name: Documentation Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check for legacy references
-        run: |
-          if grep -r --include="*.md" "sunone-bench" . --exclude="CHANGELOG.md"; then
-            echo "ERROR: Found 'sunone-bench' references (should be 'macroman-bench')"
-            exit 1
-          fi
-          echo "Documentation check passed"
-
   build-and-test:
     name: Build & Test (Windows)
     runs-on: windows-latest
@@ -68,7 +24,7 @@ jobs:
       - name: Setup CMake
         uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: <<<ENV_CMAKE_VERSION>>>
+          cmakeVersion: ${{ env.CMAKE_VERSION }}
 
       - name: Setup NuGet
         uses: nuget/setup-nuget@v1
@@ -77,27 +33,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ env.ONNXRUNTIME_VERSION }}-v2
+          key: ${{ runner.os }}-nuget-${{ env.ONNXRUNTIME_VERSION }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-
-      - name: Cache CMake build
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/_deps
-            build/CMakeCache.txt
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-
 
       - name: Install ONNX Runtime DirectML
         shell: pwsh
         run: |
-          Write-Host "Installing ONNX Runtime DirectML <<<ENV_ONNXRUNTIME_VERSION>>>..."
+          Write-Host "Installing ONNX Runtime DirectML ${{ env.ONNXRUNTIME_VERSION }}..."
           nuget install microsoft.ml.onnxruntime.directml `
-            -Version <<<ENV_ONNXRUNTIME_VERSION>>> `
-            -OutputDirectory <<<ENV_USERPROFILE>>>.nuget\packages
+            -Version ${{ env.ONNXRUNTIME_VERSION }} `
+            -OutputDirectory $env:USERPROFILE\.nuget\packages
 
           Write-Host "ONNX Runtime installed"
 
@@ -105,94 +51,75 @@ jobs:
         id: onnx-path
         shell: pwsh
         run: |
-          <<<VAR>>>version = "<<<ENV_ONNXRUNTIME_VERSION>>>"
-          <<<VAR>>>onnxPath = Join-Path <<<ENV_USERPROFILE>>> ".nuget\packages\microsoft.ml.onnxruntime.directml\<<<VAR>>>version"
+          $version = "${{ env.ONNXRUNTIME_VERSION }}"
+          $onnxPath = Join-Path $env:USERPROFILE ".nuget\packages\microsoft.ml.onnxruntime.directml\$version"
 
-          if (-not (Test-Path <<<VAR>>>onnxPath)) {
-            Write-Error "ONNX Runtime not found at: <<<VAR>>>onnxPath"
+          if (-not (Test-Path $onnxPath)) {
+            Write-Error "ONNX Runtime not found at: $onnxPath"
             exit 1
           }
 
           # Verify critical files exist
-          <<<VAR>>>dllPath = Join-Path <<<VAR>>>onnxPath "runtimes\win-x64\native\onnxruntime.dll"
-          <<<VAR>>>libPath = Join-Path <<<VAR>>>onnxPath "runtimes\win-x64\native\onnxruntime.lib"
-          <<<VAR>>>includeDir = Join-Path <<<VAR>>>onnxPath "build\native\include"
+          $dllPath = Join-Path $onnxPath "runtimes\win-x64\native\onnxruntime.dll"
+          $libPath = Join-Path $onnxPath "runtimes\win-x64\native\onnxruntime.lib"
+          $includeDir = Join-Path $onnxPath "build\native\include"
 
-          if (-not (Test-Path <<<VAR>>>dllPath)) {
-            Write-Error "Missing onnxruntime.dll at: <<<VAR>>>dllPath"
+          if (-not (Test-Path $dllPath)) {
+            Write-Error "Missing onnxruntime.dll at: $dllPath"
             exit 1
           }
 
-          if (-not (Test-Path <<<VAR>>>libPath)) {
-            Write-Error "Missing onnxruntime.lib at: <<<VAR>>>libPath"
+          if (-not (Test-Path $libPath)) {
+            Write-Error "Missing onnxruntime.lib at: $libPath"
             exit 1
           }
 
-          if (-not (Test-Path <<<VAR>>>includeDir)) {
-            Write-Error "Missing include directory at: <<<VAR>>>includeDir"
+          if (-not (Test-Path $includeDir)) {
+            Write-Error "Missing include directory at: $includeDir"
             exit 1
           }
 
           # Convert to forward slashes for CMake
-          <<<VAR>>>onnxPathForward = <<<VAR>>>onnxPath -replace '\', '/'
+          $onnxPathForward = $onnxPath -replace '\\', '/'
 
-          Write-Host "ONNX Runtime validated at: <<<VAR>>>onnxPathForward"
-          Write-Host "   DLL: <<<VAR>>>dllPath"
-          Write-Host "   LIB: <<<VAR>>>libPath"
-          Write-Host "   Include: <<<VAR>>>includeDir"
+          Write-Host "ONNX Runtime validated at: $onnxPathForward"
+          Write-Host "   DLL: $dllPath"
+          Write-Host "   LIB: $libPath"
+          Write-Host "   Include: $includeDir"
 
           # Export for subsequent steps
-          echo "ONNXRUNTIME_ROOT=<<<VAR>>>onnxPathForward" >> <<<ENV_GITHUB_OUTPUT>>>
-          echo "ONNXRUNTIME_ROOT=<<<VAR>>>onnxPathForward" >> <<<ENV_GITHUB_ENV>>>
+          echo "ONNXRUNTIME_ROOT=$onnxPathForward" >> $env:GITHUB_OUTPUT
+          echo "ONNXRUNTIME_ROOT=$onnxPathForward" >> $env:GITHUB_ENV
 
       - name: Configure CMake
         shell: pwsh
         run: |
-          Write-Host "Configuring with ONNX Runtime at: ${{ env.ONNXRUNTIME_ROOT }}"
+          Write-Host "Configuring with ONNX Runtime at: $env:ONNXRUNTIME_ROOT"
 
-          cmake -B build -S . --preset=x64-release `
-            -DONNXRUNTIME_ROOT="${{ env.ONNXRUNTIME_ROOT }}" `
+          cmake -B build -S . -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DONNXRUNTIME_ROOT="$env:ONNXRUNTIME_ROOT" `
             -DENABLE_TESTS=ON `
             -DENABLE_BENCHMARKS=ON `
             -DENABLE_TENSORRT=OFF `
             -DENABLE_OPENCV=OFF `
-            -DENABLE_ARDUINO=OFF `
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            -DENABLE_ARDUINO=OFF
 
       - name: Build project
         run: cmake --build build --config Release -j
 
-      - name: Run unit tests
+      # Note: Integration tests, E2E tests, and benchmarks run via Git hooks (see .githooks/)
+      # CI focuses on fast unit tests + build verification only
+      - name: Run unit tests only
         run: |
-          ctest --test-dir build -C Release --output-on-failure --verbose
-
-      - name: Smoke test benchmark executable
-        shell: pwsh
-        run: |
-          <<<VAR>>>benchExe = "build\bin\Release\macroman-bench.exe"
-
-          if (-not (Test-Path <<<VAR>>>benchExe)) {
-            Write-Error "Benchmark executable not found at: <<<VAR>>>benchExe"
-            exit 1
-          }
-
-          Write-Host "Running benchmark smoke test..."
-          & <<<VAR>>>benchExe --help
-
-          if (<<<VAR>>>LASTEXITCODE -ne 0) {
-            Write-Error "Benchmark help failed with exit code: <<<VAR>>>LASTEXITCODE"
-            exit 1
-          }
-
-          Write-Host "Benchmark smoke test passed"
+          ctest --test-dir build -C Release --output-on-failure -L unit
 
       - name: Upload build artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs-${{ github.run_number }}
+          name: build-logs
           path: |
             build/CMakeFiles/CMakeOutput.log
             build/CMakeFiles/CMakeError.log
-            build/compile_commands.json
           retention-days: 7

@@ -9,23 +9,25 @@ namespace macroman {
 /**
  * @brief Applies human-like imperfections to mouse movement for behavioral humanization.
  *
- * Implements two key humanization techniques from Design Doc Section 10.1:
- * 1. Reaction Delay Manager: Simulates human reaction time (μ=160ms, σ=25ms)
+ * Implements two key humanization techniques:
+ * 1. Processing Delay: Simulates realistic processing latency (μ=12ms, σ=5ms)
+ *    - Represents actual computer processing time (capture, detection, tracking)
+ *    - 6-20x faster than human reaction time (~150-250ms)
  * 2. Physiological Tremor: Adds 10Hz sinusoidal micro-jitter (0.5px amplitude)
  *
- * Philosophy: "Don't be invisible; be indistinguishable from a human."
- * Professional players exhibit these natural imperfections, making aim assistance
- * indistinguishable from skilled human play.
+ * Philosophy: "Superhuman baseline + realistic imperfections"
+ * System reacts much faster than humans but maintains natural movement patterns
+ * for behavioral safety.
  */
 class Humanizer {
 public:
     struct Config {
-        // Reaction Delay Settings
+        // Processing Delay Settings (Superhuman + Variance)
         bool enableReactionDelay = true;
-        float reactionDelayMean = 160.0f;    // μ = 160ms (trained gamer average)
-        float reactionDelayStdDev = 25.0f;   // σ = 25ms (natural variation)
-        float reactionDelayMin = 100.0f;     // Minimum human-possible reaction
-        float reactionDelayMax = 300.0f;     // Maximum bounded delay
+        float reactionDelayMean = 12.0f;     // μ = 12ms (typical processing delay)
+        float reactionDelayStdDev = 5.0f;    // σ = 5ms (network/system variance)
+        float reactionDelayMin = 5.0f;       // Minimum: 5ms (fast processing)
+        float reactionDelayMax = 25.0f;      // Maximum: 25ms (bounded delay)
 
         // Physiological Tremor Settings
         bool enableTremor = true;
@@ -36,12 +38,15 @@ public:
     explicit Humanizer(const Config& config = {});
 
     /**
-     * @brief Calculates reaction delay for a new target acquisition.
+     * @brief Calculates processing delay for a new target acquisition.
      *
-     * Samples from Normal Distribution N(μ=160ms, σ=25ms), clamped to [100ms, 300ms].
+     * Samples from Normal Distribution N(μ=12ms, σ=5ms), clamped to [5ms, 25ms].
+     * Represents realistic computer processing time (capture, detection, tracking).
      * Call this when the tracking thread switches to a new target.
      *
-     * @return Reaction delay in milliseconds
+     * Result: 6-20x faster than human reaction time (~150-250ms)
+     *
+     * @return Processing delay in milliseconds
      */
     float getReactionDelay();
 

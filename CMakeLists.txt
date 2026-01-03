@@ -8,6 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # --- Options ---
 option(BUILD_TESTS "Build unit tests" ON)
 option(ENABLE_TENSORRT "Enable TensorRT backend" ON)
+option(ENABLE_COVERAGE "Enable code coverage reporting (requires OpenCppCoverage on Windows)" OFF)
+
+# --- Code Coverage ---
+if(BUILD_TESTS)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+    include(CodeCoverage)
+endif()
 
 # --- Output Directories ---
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -118,9 +125,17 @@ target_link_libraries(imgui PRIVATE d3d11.lib d3dcompiler.lib dwmapi.lib)
 # target_link_libraries(serial PRIVATE setupapi)
 
 # 9. ONNX Runtime (Detected from NuGet or provided via -DONNXRUNTIME_ROOT)
-if(NOT ONNXRUNTIME_ROOT)
-    set(ONNXRUNTIME_ROOT "C:/Users/therouxe/.nuget/packages/microsoft.ml.onnxruntime.directml/1.22.0" CACHE PATH "Path to ONNX Runtime root")
+if(NOT DEFINED ONNXRUNTIME_ROOT)
+    # Accept environment variable from CI/CD
+    if(DEFINED ENV{ONNXRUNTIME_ROOT})
+        set(ONNXRUNTIME_ROOT "$ENV{ONNXRUNTIME_ROOT}" CACHE PATH "Path to ONNX Runtime root")
+    else()
+        # Default fallback (local development only)
+        set(ONNXRUNTIME_ROOT "C:/Users/therouxe/.nuget/packages/microsoft.ml.onnxruntime.directml/1.22.0" CACHE PATH "Path to ONNX Runtime root")
+    endif()
 endif()
+
+message(STATUS "ONNX Runtime root: ${ONNXRUNTIME_ROOT}")
 
 # Fallback check
 if(NOT EXISTS "${ONNXRUNTIME_ROOT}")
@@ -152,6 +167,9 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# --- Tools ---
+add_subdirectory(tools)
 
 # --- Assets Copy ---
 add_custom_target(CopyAssets ALL
