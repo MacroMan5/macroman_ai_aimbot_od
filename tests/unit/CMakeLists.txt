@@ -53,7 +53,9 @@ target_include_directories(unit_tests PRIVATE
 # Add to CTest
 include(CTest)
 include(Catch)
-catch_discover_tests(unit_tests)
+catch_discover_tests(unit_tests
+    PROPERTIES LABELS "unit"
+)
 
 # Code coverage target (if enabled)
 if(ENABLE_COVERAGE AND COMMAND add_code_coverage_target)

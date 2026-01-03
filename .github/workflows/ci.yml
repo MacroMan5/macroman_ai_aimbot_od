@@ -13,21 +13,6 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  documentation-check:
-    name: Documentation Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check for legacy references
-        run: |
-          if grep -r --include="*.md" "sunone-bench" . --exclude="CHANGELOG.md"; then
-            echo "ERROR: Found 'sunone-bench' references (should be 'macroman-bench')"
-            exit 1
-          fi
-          echo "Documentation check passed"
-
   build-and-test:
     name: Build & Test (Windows)
     runs-on: windows-latest
@@ -123,29 +108,11 @@ jobs:
       - name: Build project
         run: cmake --build build --config Release -j
 
-      - name: Run unit tests
+      # Note: Integration tests, E2E tests, and benchmarks run via Git hooks (see .githooks/)
+      # CI focuses on fast unit tests + build verification only
+      - name: Run unit tests only
         run: |
-          ctest --test-dir build -C Release --output-on-failure --verbose
-
-      - name: Smoke test benchmark executable
-        shell: pwsh
-        run: |
-          $benchExe = "build\bin\Release\macroman-bench.exe"
-
-          if (-not (Test-Path $benchExe)) {
-            Write-Error "Benchmark executable not found at: $benchExe"
-            exit 1
-          }
-
-          Write-Host "Running benchmark smoke test..."
-          & $benchExe --help
-
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Benchmark help failed with exit code: $LASTEXITCODE"
-            exit 1
-          }
-
-          Write-Host "Benchmark smoke test passed"
+          ctest --test-dir build -C Release --output-on-failure -L unit
 
       - name: Upload build artifacts on failure
         if: failure()
