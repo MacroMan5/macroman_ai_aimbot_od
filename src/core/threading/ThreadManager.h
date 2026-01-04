@@ -55,6 +55,16 @@ public:
      * @brief Get thread name
      */
     [[nodiscard]] const std::string& getName() const noexcept { return name_; }
+
+    /**
+     * @brief Set CPU core affinity (Phase 8 - P8-03)
+     * @param coreId CPU core ID to bind to (0-based)
+     * @return true if affinity set successfully
+     *
+     * Pins thread to specific CPU core to reduce context-switch jitter.
+     * Only beneficial on 6+ core systems. Windows-specific (SetThreadAffinityMask).
+     */
+    bool setCoreAffinity(int coreId) noexcept;
 };
 
 /**
@@ -91,6 +101,22 @@ public:
      * @brief Get count of active threads
      */
     [[nodiscard]] size_t getThreadCount() const noexcept { return threads_.size(); }
+
+    /**
+     * @brief Set CPU core affinity for a specific thread (Phase 8 - P8-03)
+     * @param threadIndex Index of thread in threads_ vector
+     * @param coreId CPU core ID to bind to (0-based)
+     * @return true if affinity set successfully
+     *
+     * Note: Only beneficial on systems with 6+ cores. Skips on lower-core systems.
+     */
+    bool setCoreAffinity(size_t threadIndex, int coreId);
+
+    /**
+     * @brief Get number of CPU cores on the system
+     * @return CPU core count
+     */
+    static unsigned int getCPUCoreCount() noexcept;
 };
 
 } // namespace macroman

@@ -60,3 +60,8 @@ if(WIN32)
         _CRT_SECURE_NO_WARNINGS
     )
 endif()
+
+# Tracy profiler integration (optional)
+if(ENABLE_TRACY)
+    target_link_libraries(macroman_core PUBLIC Tracy::TracyClient)
+endif()

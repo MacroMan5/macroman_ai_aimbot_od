@@ -12,10 +12,16 @@ target_include_directories(macroman-bench PRIVATE
     ${CMAKE_SOURCE_DIR}/tests  # For helpers/FakeScreenCapture.h access
 )
 
-# Link against core libraries
+# Link against core and tracking libraries
 target_link_libraries(macroman-bench PRIVATE
     macroman_core
+    macroman_tracking
 )
+
+# Windows high-resolution timer
+if(WIN32)
+    target_link_libraries(macroman-bench PRIVATE winmm)
+endif()
 
 # Set output directory
 set_target_properties(macroman-bench PROPERTIES

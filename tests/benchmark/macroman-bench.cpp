@@ -21,6 +21,8 @@
 #include "helpers/FakeScreenCapture.h"
 #include "helpers/FakeDetector.h"
 #include "core/entities/Detection.h"
+#include "core/entities/DetectionBatch.h"
+#include "tracking/TargetTracker.h"
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -29,6 +31,12 @@
 #include <chrono>
 #include <cmath>
 #include <string>
+
+// Windows high-resolution timer for accurate benchmarking
+#ifdef _WIN32
+#include <timeapi.h>
+#pragma comment(lib, "winmm.lib")
+#endif
 
 using namespace macroman;
 using namespace macroman::test;
@@ -57,6 +65,7 @@ struct BenchmarkArgs {
 struct BenchmarkResults {
     size_t framesProcessed{0};
     size_t detectionsTotal{0};
+    size_t trackedTargets{0};  // Total tracked targets across all frames
 
     float avgFPS{0.0f};
     float minLatency{0.0f};
@@ -66,7 +75,13 @@ struct BenchmarkResults {
     float p95Latency{0.0f};
     float p99Latency{0.0f};
 
-    std::vector<float> latencySamples;  // All latency measurements (ms)
+    // Stage-specific latencies (ms)
+    float avgDetectionLatency{0.0f};
+    float avgTrackingLatency{0.0f};
+
+    std::vector<float> latencySamples;    // All total latency measurements (ms)
+    std::vector<float> detectionSamples;  // Detection stage latency (ms)
+    std::vector<float> trackingSamples;   // Tracking stage latency (ms)
 
     bool passed{false};  // Did benchmark meet thresholds?
 };
@@ -159,6 +174,11 @@ float calculatePercentile(const std::vector<float>& sortedSamples, float percent
 BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
     BenchmarkResults results;
 
+#ifdef _WIN32
+    // Set Windows timer resolution to 1ms for accurate sleep/timing
+    timeBeginPeriod(1);
+#endif
+
     // Setup FakeScreenCapture
     FakeScreenCapture capture;
     capture.loadSyntheticFrames(args.frameCount, args.frameWidth, args.frameHeight);
@@ -166,6 +186,9 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
 
     if (!capture.initialize(nullptr)) {
         std::cerr << "ERROR: Failed to initialize FakeScreenCapture\n";
+#ifdef _WIN32
+        timeEndPeriod(1);
+#endif
         return results;
     }
 
@@ -175,8 +198,14 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
 
     if (!detector.initialize("")) {
         std::cerr << "ERROR: Failed to initialize FakeDetector\n";
+#ifdef _WIN32
+        timeEndPeriod(1);
+#endif
         return results;
     }
+
+    // Setup TargetTracker (exercises SIMD-accelerated TargetDatabase::updatePredictions)
+    TargetTracker tracker(0.1f);  // 100ms grace period
 
     // Create predefined detections (simulating real targets)
     std::vector<Detection> predefinedDetections;
@@ -192,6 +221,7 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
 
     // Run benchmark
     auto benchmarkStart = std::chrono::high_resolution_clock::now();
+    const float dt = 1.0f / 144.0f;  // Simulate 144 FPS game loop (6.94ms)
 
     for (size_t i = 0; i < args.frameCount; ++i) {
         auto frameStart = std::chrono::high_resolution_clock::now();
@@ -200,15 +230,41 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
         Frame frame = capture.captureFrame();
 
         // Detect targets (includes simulated inference delay)
+        auto detectStart = std::chrono::high_resolution_clock::now();
         DetectionList detections = detector.detect(frame);
+        auto detectEnd = std::chrono::high_resolution_clock::now();
+
+        // Convert to DetectionBatch for TargetTracker
+        DetectionBatch batch;
+        batch.frameSequence = frame.frameSequence;
+        batch.captureTimeNs = frame.captureTimeNs;
+        for (const auto& det : detections) {
+            batch.observations.push_back(det);
+        }
+
+        // Run tracking (exercises SIMD-accelerated TargetDatabase::updatePredictions)
+        auto trackStart = std::chrono::high_resolution_clock::now();
+        tracker.update(std::move(batch), dt);
+
+        // Get aim command (exercises TargetSelector)
+        Vec2 crosshair{static_cast<float>(args.frameWidth) / 2.0f,
+                       static_cast<float>(args.frameHeight) / 2.0f};
+        AimCommand cmd = tracker.getAimCommand(crosshair, 500.0f);  // 500px FOV radius
+        auto trackEnd = std::chrono::high_resolution_clock::now();
 
         auto frameEnd = std::chrono::high_resolution_clock::now();
 
-        // Measure latency
-        float latencyMs = std::chrono::duration<float, std::milli>(frameEnd - frameStart).count();
-        results.latencySamples.push_back(latencyMs);
+        // Measure latencies
+        float detectLatencyMs = std::chrono::duration<float, std::milli>(detectEnd - detectStart).count();
+        float trackLatencyMs = std::chrono::duration<float, std::milli>(trackEnd - trackStart).count();
+        float totalLatencyMs = std::chrono::duration<float, std::milli>(frameEnd - frameStart).count();
+
+        results.detectionSamples.push_back(detectLatencyMs);
+        results.trackingSamples.push_back(trackLatencyMs);
+        results.latencySamples.push_back(totalLatencyMs);
 
         results.detectionsTotal += detections.size();
+        results.trackedTargets += tracker.getDatabase().getCount();
         results.framesProcessed++;
 
         // Progress indicator (every 10%)
@@ -219,6 +275,11 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
     }
 
     auto benchmarkEnd = std::chrono::high_resolution_clock::now();
+
+#ifdef _WIN32
+    // Restore default timer resolution
+    timeEndPeriod(1);
+#endif
 
     // Calculate metrics
     float totalTimeS = std::chrono::duration<float>(benchmarkEnd - benchmarkStart).count();
@@ -246,6 +307,18 @@ BenchmarkResults runBenchmark(const BenchmarkArgs& args) {
     results.p95Latency = calculatePercentile(sortedLatencies, 95.0f);
     results.p99Latency = calculatePercentile(sortedLatencies, 99.0f);
 
+    // Calculate stage-specific averages
+    if (!results.detectionSamples.empty()) {
+        results.avgDetectionLatency = std::accumulate(results.detectionSamples.begin(),
+                                                       results.detectionSamples.end(), 0.0f)
+                                      / results.detectionSamples.size();
+    }
+    if (!results.trackingSamples.empty()) {
+        results.avgTrackingLatency = std::accumulate(results.trackingSamples.begin(),
+                                                      results.trackingSamples.end(), 0.0f)
+                                     / results.trackingSamples.size();
+    }
+
     // Check thresholds
     bool fpsPass = results.avgFPS >= args.thresholdAvgFPS;
     bool p95Pass = results.p95Latency <= args.thresholdP95Latency;
@@ -268,12 +341,17 @@ void printResults(const BenchmarkResults& results, const BenchmarkArgs& args) {
     std::cout << "Throughput:\n";
     std::cout << "  Frames Processed:    " << results.framesProcessed << "\n";
     std::cout << "  Detections Total:    " << results.detectionsTotal << "\n";
+    std::cout << "  Tracked Targets:     " << results.trackedTargets << "\n";
     std::cout << "  Average FPS:         " << std::fixed << std::setprecision(2) << results.avgFPS;
     if (results.avgFPS >= args.thresholdAvgFPS) {
         std::cout << "  [✓ PASS: >= " << args.thresholdAvgFPS << "]\n";
     } else {
         std::cout << "  [✗ FAIL: < " << args.thresholdAvgFPS << "]\n";
     }
+
+    std::cout << "\nPipeline Stage Latency (ms):\n";
+    std::cout << "  Detection (avg):     " << std::fixed << std::setprecision(2) << results.avgDetectionLatency << "\n";
+    std::cout << "  Tracking (avg):      " << results.avgTrackingLatency << " (SIMD-accelerated)\n";
 
     std::cout << "\nLatency (ms):\n";
     std::cout << "  Min:                 " << std::fixed << std::setprecision(2) << results.minLatency << "\n";

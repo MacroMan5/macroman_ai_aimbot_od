@@ -27,13 +27,18 @@ namespace macroman {
 
 /**
  * @brief Per-thread performance metrics
+ *
+ * CACHE LINE OPTIMIZATION (Phase 8 - P8-05):
+ * - Each atomic is aligned to 64-byte cache line to prevent false sharing
+ * - 4 threads update separate ThreadMetrics instances concurrently
+ * - Without alignment, adjacent atomics cause cache line bouncing (10-20% overhead)
  */
-struct ThreadMetrics {
-    std::atomic<uint64_t> frameCount{0};      // Total frames processed
-    std::atomic<float> avgLatency{0.0f};      // Exponential moving average (ms)
-    std::atomic<float> minLatency{999999.0f}; // Minimum latency (ms)
-    std::atomic<float> maxLatency{0.0f};      // Maximum latency (ms)
-    std::atomic<uint64_t> droppedFrames{0};   // Frames dropped (backpressure)
+struct alignas(64) ThreadMetrics {
+    alignas(64) std::atomic<uint64_t> frameCount{0};      // Total frames processed
+    alignas(64) std::atomic<float> avgLatency{0.0f};      // Exponential moving average (ms)
+    alignas(64) std::atomic<float> minLatency{999999.0f}; // Minimum latency (ms)
+    alignas(64) std::atomic<float> maxLatency{0.0f};      // Maximum latency (ms)
+    alignas(64) std::atomic<uint64_t> droppedFrames{0};   // Frames dropped (backpressure)
 
     /**
      * @brief Update metrics with new latency sample
@@ -90,6 +95,13 @@ struct ThreadMetrics {
     }
 };
 
+// Verify cache line alignment (Phase 8 - P8-05)
+// Each of 5 atomics should occupy separate 64-byte cache lines = 320 bytes minimum
+static_assert(sizeof(ThreadMetrics) >= 320,
+    "ThreadMetrics must be at least 320 bytes (5 atomics × 64-byte cache lines)");
+static_assert(alignof(ThreadMetrics) == 64,
+    "ThreadMetrics must be aligned to 64-byte cache line boundary");
+
 /**
  * @brief Global performance metrics (lock-free, thread-safe)
  *
@@ -101,11 +113,11 @@ public:
     PerformanceMetrics() = default;
     ~PerformanceMetrics() = default;
 
-    // Per-thread metrics
-    ThreadMetrics capture;
-    ThreadMetrics detection;
-    ThreadMetrics tracking;
-    ThreadMetrics input;
+    // Per-thread metrics (each aligned to 64-byte cache line to prevent false sharing)
+    alignas(64) ThreadMetrics capture;
+    alignas(64) ThreadMetrics detection;
+    alignas(64) ThreadMetrics tracking;
+    alignas(64) ThreadMetrics input;
 
     // Global throughput metrics
     std::atomic<float> overallFPS{0.0f};       // Frames per second (updated by capture thread)

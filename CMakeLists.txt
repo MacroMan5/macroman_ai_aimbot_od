@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_TESTS "Build unit tests" ON)
 option(ENABLE_TENSORRT "Enable TensorRT backend" ON)
 option(ENABLE_COVERAGE "Enable code coverage reporting (requires OpenCppCoverage on Windows)" OFF)
+option(ENABLE_TRACY "Enable Tracy profiler integration (Phase 8 - P8-01)" OFF)
 
 # --- Code Coverage ---
 if(BUILD_TESTS)
@@ -23,10 +24,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # --- Compiler Settings ---
 if(MSVC)
-    add_compile_options(/W4 /MP /permissive- /Zc:__cplusplus)
+    add_compile_options(/W4 /MP /permissive- /Zc:__cplusplus /arch:AVX2)  # Phase 8 - P8-02: Enable AVX2 SIMD
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DWIN32_LEAN_AND_MEAN)
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic -mavx2 -mfma)  # Phase 8 - P8-02: Enable AVX2 + FMA
 endif()
 
 # --- Dependencies Management ---
@@ -64,6 +65,26 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Eigen)
 set(BUILD_TESTING ON CACHE BOOL "" FORCE)  # Re-enable for our tests
+
+# 3.5. Tracy Profiler (Phase 8 - P8-01) - Optional profiling
+if(ENABLE_TRACY)
+    message(STATUS "Tracy profiler enabled")
+    FetchContent_Declare(
+        tracy
+        GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+        # NOTE: Pinned to v0.10 for stability and reproducible builds.
+        # v0.10 is compatible with our ZONE_SCOPED/FRAME_MARK usage.
+        # Update after verifying newer releases don't break Windows build.
+        GIT_TAG v0.10
+    )
+    FetchContent_MakeAvailable(tracy)
+
+    # Enable Tracy client
+    add_compile_definitions(ENABLE_TRACY)
+    add_compile_definitions(TRACY_ENABLE)
+else()
+    message(STATUS "Tracy profiler disabled (use -DENABLE_TRACY=ON to enable)")
+endif()
 
 # 4. OpenCV (Optional - minimal usage in Phase 2)
 if(NOT OpenCV_DIR)

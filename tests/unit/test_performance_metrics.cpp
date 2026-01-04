@@ -334,3 +334,60 @@ TEST_CASE("PerformanceMetrics - Snapshot Immutability", "[metrics]") {
     REQUIRE(snap2.captureFrames == 2);
     REQUIRE(snap2.captureLatencyAvg != snap1.captureLatencyAvg);
 }
+
+TEST_CASE("PerformanceMetrics - Cache Line Alignment (Phase 8 - P8-05)", "[metrics][alignment]") {
+    SECTION("ThreadMetrics is aligned to 64-byte cache line") {
+        // Each atomic should be on separate cache line (64 bytes)
+        // ThreadMetrics has 5 atomics → minimum 320 bytes
+        REQUIRE(sizeof(ThreadMetrics) >= 320);
+        REQUIRE(alignof(ThreadMetrics) == 64);
+    }
+
+    SECTION("PerformanceMetrics has 4 aligned ThreadMetrics") {
+        PerformanceMetrics metrics;
+
+        // Verify each ThreadMetrics instance is properly aligned
+        REQUIRE(reinterpret_cast<uintptr_t>(&metrics.capture) % 64 == 0);
+        REQUIRE(reinterpret_cast<uintptr_t>(&metrics.detection) % 64 == 0);
+        REQUIRE(reinterpret_cast<uintptr_t>(&metrics.tracking) % 64 == 0);
+        REQUIRE(reinterpret_cast<uintptr_t>(&metrics.input) % 64 == 0);
+    }
+
+    SECTION("No false sharing between ThreadMetrics instances") {
+        PerformanceMetrics metrics;
+
+        // Each ThreadMetrics should be at least 320 bytes apart
+        uintptr_t capturePtr = reinterpret_cast<uintptr_t>(&metrics.capture);
+        uintptr_t detectionPtr = reinterpret_cast<uintptr_t>(&metrics.detection);
+        uintptr_t trackingPtr = reinterpret_cast<uintptr_t>(&metrics.tracking);
+        uintptr_t inputPtr = reinterpret_cast<uintptr_t>(&metrics.input);
+
+        // Verify minimum spacing (prevents cache line bouncing)
+        REQUIRE(detectionPtr - capturePtr >= 320);
+        REQUIRE(trackingPtr - detectionPtr >= 320);
+        REQUIRE(inputPtr - trackingPtr >= 320);
+    }
+
+    SECTION("Performance: No regression with metrics collection") {
+        PerformanceMetrics metrics;
+
+        // Baseline: Record 10,000 samples
+        auto start = std::chrono::high_resolution_clock::now();
+
+        for (int i = 0; i < 10000; ++i) {
+            metrics.recordCaptureLatency(5.0f + (i % 10));
+        }
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+        // Verify reasonable performance (should be <1ms for 10k samples)
+        REQUIRE(duration < 1000);  // Less than 1 millisecond
+
+        // Verify correctness wasn't sacrificed for performance
+        auto snap = metrics.snapshot();
+        REQUIRE(snap.captureFrames == 10000);
+        REQUIRE(snap.captureLatencyMin >= 5.0f);
+        REQUIRE(snap.captureLatencyMax <= 15.0f);
+    }
+}

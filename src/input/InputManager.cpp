@@ -1,6 +1,9 @@
 #include "InputManager.h"
 #include "core/utils/Logger.h"
+#include "core/profiling/Profiler.h"
 #include <Windows.h>  // For SetThreadPriority
+#include <timeapi.h>  // For timeBeginPeriod/timeEndPeriod (Phase 8 - P8-04)
+#pragma comment(lib, "winmm.lib")  // Link Windows Multimedia library
 #include <sstream>    // For thread ID logging
 
 namespace macroman {
@@ -22,10 +25,28 @@ InputManager::InputManager(
     plannerConfig.screenWidth = config_.screenWidth;
     plannerConfig.screenHeight = config_.screenHeight;
     planner_->setConfig(plannerConfig);
+
+    // Phase 8 - P8-04: Set Windows timer resolution to 1ms for accurate 1000Hz loop
+    // Default Windows resolution is 15.6ms, which causes sleep_for(1ms) to sleep 2-15ms
+    // This tightens variance from ~600-1500Hz to ~980-1020Hz
+#ifdef _WIN32
+    MMRESULT result = timeBeginPeriod(1);
+    if (result != TIMERR_NOERROR) {
+        LOG_WARN("Failed to set timer resolution to 1ms (error: {})", result);
+    } else {
+        LOG_INFO("Windows timer resolution set to 1ms (high-resolution mode)");
+    }
+#endif
 }
 
 InputManager::~InputManager() {
     stop();
+
+    // Phase 8 - P8-04: Restore default timer resolution
+#ifdef _WIN32
+    timeEndPeriod(1);
+    LOG_INFO("Windows timer resolution restored to default");
+#endif
 }
 
 bool InputManager::start() {
@@ -102,6 +123,8 @@ void InputManager::setConfig(const InputConfig& config) {
 }
 
 void InputManager::inputLoop() {
+    ZONE_SCOPED;  // Tracy profiler instrumentation (Phase 8 - P8-01)
+
     // Convert thread ID to string for logging (std::thread::id not directly formattable)
     std::ostringstream oss;
     oss << std::this_thread::get_id();
