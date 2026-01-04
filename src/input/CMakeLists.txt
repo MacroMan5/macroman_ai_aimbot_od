@@ -54,3 +54,8 @@ endif()
 target_include_directories(macroman_input PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+# Tracy profiler integration (optional)
+if(ENABLE_TRACY)
+    target_link_libraries(macroman_input PUBLIC Tracy::TracyClient)
+endif()
