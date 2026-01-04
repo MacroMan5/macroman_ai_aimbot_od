@@ -77,6 +77,32 @@ bool ManagedThread::isRunning() const noexcept {
     return thread_.joinable() && !stopFlag_.load(std::memory_order_acquire);
 }
 
+bool ManagedThread::setCoreAffinity(int coreId) noexcept {
+#ifdef _WIN32
+    if (!thread_.joinable()) {
+        std::cerr << "[ThreadManager] Error: Cannot set affinity on non-running thread '"
+                  << name_ << "'" << std::endl;
+        return false;
+    }
+
+    HANDLE handle = reinterpret_cast<HANDLE>(thread_.native_handle());
+    DWORD_PTR mask = 1ULL << coreId;
+
+    if (SetThreadAffinityMask(handle, mask) == 0) {
+        std::cerr << "[ThreadManager] Warning: Failed to set affinity for thread '"
+                  << name_ << "' to core " << coreId << std::endl;
+        return false;
+    }
+
+    return true;
+#else
+    // Non-Windows platforms not supported (could add pthread_setaffinity_np for Linux)
+    (void)coreId;  // Suppress unused parameter warning
+    std::cerr << "[ThreadManager] Warning: Thread affinity not supported on this platform" << std::endl;
+    return false;
+#endif
+}
+
 // ============================================================================
 // ThreadManager Implementation
 // ============================================================================
@@ -105,6 +131,36 @@ bool ThreadManager::stopAll(std::chrono::milliseconds timeout) {
 
     threads_.clear();
     return allStopped;
+}
+
+bool ThreadManager::setCoreAffinity(size_t threadIndex, int coreId) {
+    if (threadIndex >= threads_.size()) {
+        std::cerr << "[ThreadManager] Error: Thread index " << threadIndex
+                  << " out of range (count: " << threads_.size() << ")" << std::endl;
+        return false;
+    }
+
+    // Skip affinity on systems with <6 cores (not beneficial, per design doc)
+    unsigned int coreCount = getCPUCoreCount();
+    if (coreCount < 6) {
+        std::cerr << "[ThreadManager] Info: Skipping thread affinity on " << coreCount
+                  << "-core system (only beneficial on 6+ cores)" << std::endl;
+        return false;
+    }
+
+    // Validate core ID
+    if (coreId < 0 || static_cast<unsigned int>(coreId) >= coreCount) {
+        std::cerr << "[ThreadManager] Error: Core ID " << coreId
+                  << " out of range (0-" << (coreCount - 1) << ")" << std::endl;
+        return false;
+    }
+
+    return threads_[threadIndex]->setCoreAffinity(coreId);
+}
+
+unsigned int ThreadManager::getCPUCoreCount() noexcept {
+    unsigned int count = std::thread::hardware_concurrency();
+    return count > 0 ? count : 1;  // Fallback to 1 if detection fails
 }
 
 } // namespace macroman
