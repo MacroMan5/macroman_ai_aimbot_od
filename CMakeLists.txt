@@ -192,6 +192,30 @@ endif()
 # --- Tools ---
 add_subdirectory(tools)
 
+# --- Doxygen Documentation ---
+find_package(Doxygen OPTIONAL_COMPONENTS dot)
+if(DOXYGEN_FOUND)
+    set(DOXYFILE_IN ${CMAKE_SOURCE_DIR}/docs/Doxyfile.in)
+    set(DOXYFILE_OUT ${CMAKE_BINARY_DIR}/Doxyfile)
+
+    # Configure Doxygen file with CMake variables
+    configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
+
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+
+    message(STATUS "Doxygen found: ${DOXYGEN_VERSION} - target 'docs' available")
+    if(DOXYGEN_DOT_FOUND)
+        message(STATUS "Graphviz (dot) found - class diagrams enabled")
+    endif()
+else()
+    message(STATUS "Doxygen not found - documentation target disabled")
+endif()
+
 # --- Assets Copy ---
 add_custom_target(CopyAssets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
