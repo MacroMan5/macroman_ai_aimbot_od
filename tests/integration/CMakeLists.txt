@@ -3,6 +3,7 @@
 # Integration test executable
 add_executable(integration_tests
     test_pipeline_integration.cpp
+    test_config_integration.cpp
     ../helpers/FakeScreenCapture.cpp
     ../helpers/FakeDetector.cpp
 )

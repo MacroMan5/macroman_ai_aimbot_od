@@ -20,6 +20,7 @@ add_executable(unit_tests
     test_profile_manager.cpp
     test_game_detector.cpp
     test_shared_config.cpp
+    test_global_config.cpp
     test_debug_overlay.cpp
     test_bezier_curve.cpp
     test_fake_screen_capture.cpp

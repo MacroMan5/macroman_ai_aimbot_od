@@ -1,0 +1,26 @@
+{
+  "gameId": "pubg",
+  "displayName": "PLAYERUNKNOWN'S BATTLEGROUNDS",
+  "processNames": ["TslGame.exe", "PUBG.exe"],
+  "windowTitles": ["PLAYERUNKNOWN'S BATTLEGROUNDS", "PUBG"],
+
+  "detection": {
+    "modelPath": "models/pubg_yolov8_640.onnx",
+    "inputSize": [640, 640],
+    "confidenceThreshold": 0.57,
+    "nmsThreshold": 0.43,
+    "hitboxMapping": {
+      "0": "head",
+      "1": "chest",
+      "2": "body"
+    }
+  },
+
+  "targeting": {
+    "fov": 85.0,
+    "smoothness": 0.66,
+    "predictionStrength": 0.76,
+    "hitboxPriority": ["head", "chest", "body"],
+    "inputLatency": 14.2
+  }
+}
