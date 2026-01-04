@@ -57,13 +57,17 @@ This backlog tracks granular tasks across all development phases.
 - [x] Critical Traps #2 & #4 addressed (prediction clamping + deadman switch)
 - [x] Documentation (docs/ARDUINO_SETUP.md for ArduinoDriver setup)
 
-## Phase 5: Configuration & Auto-Detection ⚪
-- [ ] Implement Game Profile JSON system
-- [ ] Implement `GameDetector` (Auto-detection with hysteresis)
-- [ ] Implement `SharedConfig` (Memory-mapped IPC for live tuning) - **Note:** Base implementation exists in src/core/config/
-- [ ] Implement `SharedConfigManager` (Windows memory-mapped file wrapper)
-- [ ] Implement ModelManager (Thread-safe model switching)
-- [ ] Unit tests for config components
+## Phase 5: Configuration & Auto-Detection ✅ **COMPLETE**
+- [x] Implement Game Profile JSON system (GameProfile.h, valorant.json, cs2.json)
+- [x] Implement `GameDetector` (Auto-detection with 3-second hysteresis)
+- [x] Implement `SharedConfig` (Memory-mapped IPC, 64-byte cache-line alignment, static_assert lock-free)
+- [x] Implement `SharedConfigManager` (Windows CreateFileMapping/MapViewOfFile wrapper)
+- [x] Implement `ProfileManager` (JSON parsing, validation, findProfileByProcess)
+- [x] Implement ModelManager (Thread-safe model switching, VRAM tracking)
+- [x] Implement `GlobalConfig` (INI parser for global.ini)
+- [x] Unit tests for config components (test_shared_config.cpp, test_global_config.cpp)
+- [x] Integration tests for config hierarchy (test_config_integration.cpp)
+- [x] Phase 5 Completion Documentation (docs/phase5-completion.md)
 
 ## Phase 6: UI & Observability ✅ **COMPLETE**
 - [x] In-game overlay (ImGui transparent window - 800x600, frameless)
@@ -105,6 +109,20 @@ This backlog tracks granular tasks across all development phases.
 ---
 
 ## ✅ Completed Tasks
+- [2026-01-04] **Phase 5 Configuration & Auto-Detection Complete** (Commits: merged in dev branch)
+  - GameProfile JSON schema with DetectionConfig and TargetingConfig
+  - ProfileManager with JSON parsing, validation, findProfileByProcess()
+  - GameDetector with 3-second hysteresis for stable game switching
+  - SharedConfig with 64-byte cache-line alignment, static_assert lock-free verification
+  - SharedConfigManager with Windows CreateFileMapping/MapViewOfFile IPC
+  - ModelManager with thread-safe model switching, VRAM tracking
+  - GlobalConfig with INI parser for global settings (config/global.ini)
+  - ConfigSnapshot for UI-safe non-atomic reading
+  - Game profiles (4 supported): valorant.json, cs2.json, rust.json, pubg.json
+  - Unit tests: test_shared_config.cpp, test_global_config.cpp
+  - Integration tests: test_config_integration.cpp
+  - Phase 5 Completion Documentation: docs/phase5-completion.md
+  - All components follow CRITICAL_TRAPS.md guidelines (Trap #3: lock-free atomics)
 - [2026-01-03] **Phase 8 Optimization & Polish Complete (P0/P1 Tasks)** (Commits: TBD)
   - **P8-05 (CRITICAL)**: PerformanceMetrics false sharing fix (alignas(64) for ThreadMetrics struct and atomic fields)
   - **P8-01**: Tracy profiler integration (Profiler.h with conditional macros, FetchContent v0.10, InputManager instrumentation)

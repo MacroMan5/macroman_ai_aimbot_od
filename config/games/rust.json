@@ -1,0 +1,26 @@
+{
+  "gameId": "rust",
+  "displayName": "Rust",
+  "processNames": ["RustClient.exe", "rust.exe"],
+  "windowTitles": ["Rust"],
+
+  "detection": {
+    "modelPath": "models/rust_yolov8_640.onnx",
+    "inputSize": [640, 640],
+    "confidenceThreshold": 0.58,
+    "nmsThreshold": 0.42,
+    "hitboxMapping": {
+      "0": "head",
+      "1": "chest",
+      "2": "body"
+    }
+  },
+
+  "targeting": {
+    "fov": 75.0,
+    "smoothness": 0.68,
+    "predictionStrength": 0.78,
+    "hitboxPriority": ["head", "chest", "body"],
+    "inputLatency": 13.5
+  }
+}
