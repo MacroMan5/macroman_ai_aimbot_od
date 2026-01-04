@@ -113,11 +113,11 @@ public:
     PerformanceMetrics() = default;
     ~PerformanceMetrics() = default;
 
-    // Per-thread metrics
-    ThreadMetrics capture;
-    ThreadMetrics detection;
-    ThreadMetrics tracking;
-    ThreadMetrics input;
+    // Per-thread metrics (each aligned to 64-byte cache line to prevent false sharing)
+    alignas(64) ThreadMetrics capture;
+    alignas(64) ThreadMetrics detection;
+    alignas(64) ThreadMetrics tracking;
+    alignas(64) ThreadMetrics input;
 
     // Global throughput metrics
     std::atomic<float> overallFPS{0.0f};       // Frames per second (updated by capture thread)

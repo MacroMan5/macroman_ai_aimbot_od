@@ -38,9 +38,10 @@
     #define ZONE_VALUE(name, value) TracyPlot(name, value)
 #else
     // Tracy disabled - macros expand to nothing (zero overhead)
+    // Use (void) casts to suppress -Wunused-parameter warnings
     #define ZONE_SCOPED
-    #define ZONE_NAMED(name)
+    #define ZONE_NAMED(name) ((void)(name))
     #define FRAME_MARK
-    #define ZONE_VALUE(name, value)
+    #define ZONE_VALUE(name, value) ((void)(name), (void)(value))
 #endif
 

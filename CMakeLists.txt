@@ -72,6 +72,9 @@ if(ENABLE_TRACY)
     FetchContent_Declare(
         tracy
         GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+        # NOTE: Pinned to v0.10 for stability and reproducible builds.
+        # v0.10 is compatible with our ZONE_SCOPED/FRAME_MARK usage.
+        # Update after verifying newer releases don't break Windows build.
         GIT_TAG v0.10
     )
     FetchContent_MakeAvailable(tracy)

@@ -85,6 +85,13 @@ bool ManagedThread::setCoreAffinity(int coreId) noexcept {
         return false;
     }
 
+    // Validate coreId range (Windows affinity mask is 64-bit, so max 64 cores per group)
+    if (coreId < 0 || coreId >= 64) {
+        std::cerr << "[ThreadManager] Error: Core ID " << coreId
+                  << " out of range (0-63). Systems with >64 cores require processor groups." << std::endl;
+        return false;
+    }
+
     HANDLE handle = reinterpret_cast<HANDLE>(thread_.native_handle());
     DWORD_PTR mask = 1ULL << coreId;
 
