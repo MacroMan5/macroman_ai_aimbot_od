@@ -8,7 +8,8 @@ add_subdirectory(ui)  # Phase 6: UI & Observability
 # Config will be added in Phase 5
 
 # Main Executable (minimal Phase 2 version)
-add_executable(macroman_aimbot main.cpp)
+add_executable(macroman_aimbot main.cpp Engine.cpp)
+target_include_directories(macroman_aimbot PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 # Enable C++/WinRT for main
 if(MSVC)
@@ -20,6 +21,22 @@ target_link_libraries(macroman_aimbot PRIVATE
     macroman_core
     macroman_capture
     macroman_detection
+    macroman_tracking
+    macroman_input
+    macroman_ui
+    spdlog::spdlog
+    d3d11.lib
+    dxgi.lib
+)
+
+# UI Demo Application (Phase 10 - P10-04)
+# Standalone test for UI rendering without full Engine pipeline
+add_executable(macroman_ui_demo WIN32 ui_demo_main.cpp)
+target_include_directories(macroman_ui_demo PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(macroman_ui_demo PRIVATE
+    macroman_core
+    macroman_ui
     spdlog::spdlog
     d3d11.lib
     dxgi.lib

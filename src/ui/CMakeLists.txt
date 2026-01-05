@@ -1,6 +1,6 @@
 # macroman_ui library (overlay components only - excludes config_app executable)
-file(GLOB_RECURSE UI_SOURCES "overlay/*.cpp")
-file(GLOB_RECURSE UI_HEADERS "overlay/*.h")
+file(GLOB_RECURSE UI_SOURCES "overlay/*.cpp" "backend/*.cpp")
+file(GLOB_RECURSE UI_HEADERS "overlay/*.h" "backend/*.h")
 
 add_library(macroman_ui STATIC ${UI_SOURCES} ${UI_HEADERS})
 
