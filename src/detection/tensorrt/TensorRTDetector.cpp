@@ -26,7 +26,7 @@ extern "C" void launchPreprocessKernel(
     cudaStream_t stream
 );
 
-namespace sunone {
+namespace macroman {
 
 // TensorRT logger
 class TRTLogger : public nvinfer1::ILogger {
@@ -438,6 +438,14 @@ void TensorRTDetector::unregisterTexture() {
 
 DetectionList TensorRTDetector::detect(const Frame& frame) {
     if (!ready_ || frame.empty()) {
+        LOG_ERROR("TensorRTDetector: Invalid frame");
+        return {};
+    }
+
+    // Get GPU texture from frame
+    auto gpuTexture = frame.getD3DTexture();
+    if (!gpuTexture) {
+        LOG_ERROR("TensorRTDetector: Frame missing GPU texture");
         return {};
     }
 
@@ -451,34 +459,32 @@ DetectionList TensorRTDetector::detect(const Frame& frame) {
         const auto& config = config_;
 
         // ---------------------------------------------------------
-        // PRE-PROCESSING
+        // PRE-PROCESSING (GPU-ONLY PATH)
         // ---------------------------------------------------------
         auto startPre = std::chrono::high_resolution_clock::now();
 
-        // Check for GPU texture (Zero-Copy Path)
-        if (frame.gpuTexture && config.useGpuAcceleration) {
-            if (!registerTexture(frame.gpuTexture.Get())) {
-                // Fallback to CPU if registration fails
-                std::cerr << "[TensorRTDetector] GPU registration failed, falling back to CPU" << std::endl;
-                goto cpu_fallback;
+        if (config.useGpuAcceleration) {
+            if (!registerTexture(gpuTexture)) {
+                LOG_ERROR("TensorRTDetector: GPU registration failed");
+                return {};
             }
 
             // Map resource
             cudaError_t err = cudaGraphicsMapResources(1, &cudaResource_, cudaStream_);
             if (err != cudaSuccess) {
-                 std::cerr << "[TensorRTDetector] Map resources failed" << std::endl;
-                 goto cpu_fallback;
+                LOG_ERROR("TensorRTDetector: Map resources failed: {}", cudaGetErrorString(err));
+                return {};
             }
 
             cudaArray_t cuArray;
             err = cudaGraphicsSubResourceGetMappedArray(&cuArray, cudaResource_, 0, 0);
             if (err != cudaSuccess) {
                 cudaGraphicsUnmapResources(1, &cudaResource_, cudaStream_);
-                goto cpu_fallback;
+                LOG_ERROR("TensorRTDetector: Get mapped array failed: {}", cudaGetErrorString(err));
+                return {};
             }
 
             // Create texture object if needed (or recreate if array changed)
-            // Ideally we cache this unless texture changes
             if (cudaTexture_ == 0) {
                 cudaResourceDesc resDesc;
                 memset(&resDesc, 0, sizeof(resDesc));
@@ -490,53 +496,32 @@ DetectionList TensorRTDetector::detect(const Frame& frame) {
                 texDesc.addressMode[0] = cudaAddressModeClamp;
                 texDesc.addressMode[1] = cudaAddressModeClamp;
                 texDesc.filterMode = cudaFilterModeLinear;
-                texDesc.readMode = cudaReadModeNormalizedFloat; // Important: Get 0.0-1.0 float
+                texDesc.readMode = cudaReadModeNormalizedFloat; // Get 0.0-1.0 float
                 texDesc.normalizedCoords = 0; // Use non-normalized coords (0..width)
 
                 err = cudaCreateTextureObject(&cudaTexture_, &resDesc, &texDesc, nullptr);
                 if (err != cudaSuccess) {
-                     cudaGraphicsUnmapResources(1, &cudaResource_, cudaStream_);
-                     goto cpu_fallback;
+                    cudaGraphicsUnmapResources(1, &cudaResource_, cudaStream_);
+                    LOG_ERROR("TensorRTDetector: Create texture object failed: {}", cudaGetErrorString(err));
+                    return {};
                 }
             }
 
-            // Run Kernel
+            // Run preprocessing kernel
+            // ROI is handled by preprocessing kernel - use full texture
             launchPreprocessKernel(
                 cudaTexture_,
                 static_cast<float*>(inputDeviceBuffer_),
-                frame.width, frame.height, // These are usually ROI size if cropped, or full size
+                frame.width, frame.height,
                 modelInfo_.inputWidth, modelInfo_.inputHeight,
-                frame.roiX, frame.roiY, frame.width, frame.height,
+                0, 0, frame.width, frame.height,  // ROI: full texture
                 cudaStream_
             );
-            
+
             cudaGraphicsUnmapResources(1, &cudaResource_, cudaStream_);
-
         } else {
-        cpu_fallback:
-            // Legacy CPU Path
-            // Preprocess image
-            cv::Mat resized;
-            if (frame.image.empty()) return {}; // Should not happen if gpuTexture was null
-            
-            cv::resize(frame.image, resized, cv::Size(modelInfo_.inputWidth, modelInfo_.inputHeight));
-            cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB);
-            resized.convertTo(resized, CV_32FC3, 1.0f / 255.0f);
-
-            // Convert to tensor format [1, 3, H, W]
-            std::vector<cv::Mat> channels(3);
-            cv::split(resized, channels);
-
-            const size_t planeSize = static_cast<size_t>(modelInfo_.inputHeight) * modelInfo_.inputWidth;
-            std::vector<float> inputTensorValues(1 * 3 * planeSize);
-
-            for (int c = 0; c < 3; ++c) {
-                memcpy(&inputTensorValues[c * planeSize], channels[c].data, planeSize * sizeof(float));
-            }
-
-            // Copy input to device
-            size_t inputSize = inputTensorValues.size() * sizeof(float);
-            cudaMemcpyAsync(inputDeviceBuffer_, inputTensorValues.data(), inputSize, cudaMemcpyHostToDevice, cudaStream_);
+            LOG_ERROR("TensorRTDetector: GPU acceleration disabled - not supported in zero-copy architecture");
+            return {};
         }
 
         auto endPre = std::chrono::high_resolution_clock::now();
@@ -616,20 +601,21 @@ DetectionList TensorRTDetector::detect(const Frame& frame) {
             int height = static_cast<int>(h * config.detectionResolution);
 
             Detection d;
-            d.box = cv::Rect(x, y, width, height);
+            d.bbox = BBox{static_cast<float>(x), static_cast<float>(y),
+                         static_cast<float>(width), static_cast<float>(height)};
             d.confidence = maxClassScore;
             d.classId = maxClassId;
             detections.push_back(d);
         }
 
-        // Apply NMS
-        DetectionList finalDetections = PostProcessor::applyNMS(detections, nmsThreshold);
+        // Apply NMS (modifies detections in-place, returns void)
+        PostProcessor::applyNMS(detections, nmsThreshold);
 
         auto endPost = std::chrono::high_resolution_clock::now();
         stats_.postProcessTimeMs = std::chrono::duration<float, std::milli>(endPost - startPost).count();
         stats_.totalTimeMs = std::chrono::duration<float, std::milli>(endPost - startTotal).count();
 
-        return finalDetections;
+        return detections;
 
     } catch (const std::exception& e) {
         std::cerr << "[TensorRTDetector] Detection error: " << e.what() << std::endl;
@@ -645,6 +631,6 @@ ModelInfo TensorRTDetector::getModelInfo() const {
     return modelInfo_;
 }
 
-} // namespace sunone
+} // namespace macroman
 
 #endif // USE_CUDA

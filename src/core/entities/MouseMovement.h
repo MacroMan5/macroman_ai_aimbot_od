@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace sunone {
+namespace macroman {
 
 struct MouseMovement {
     int dx;
@@ -19,4 +19,4 @@ struct MouseMovement {
     }
 };
 
-} // namespace sunone
+} // namespace macroman

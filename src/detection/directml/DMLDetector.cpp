@@ -1,16 +1,15 @@
 #include "DMLDetector.h"
 #include "../postprocess/PostProcessor.h"
 #include "../../core/utils/PathUtils.h"
+#include "../../core/utils/Logger.h"
 #include <dml_provider_factory.h>
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc.hpp>
 #include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <thread>
 #include <d3dcompiler.h>
 
-namespace sunone {
+namespace macroman {
 
 DMLDetector::DMLDetector()
     : env_(ORT_LOGGING_LEVEL_WARNING, "SunoneAimbot_DML"),
@@ -164,7 +163,7 @@ bool DMLDetector::compileComputeShader() {
     HRESULT hr = D3DCompile(
         shaderSource.c_str(), shaderSource.length(),
         nullptr, nullptr, nullptr,
-        "main", "cs_5_0",
+        "CSMain", "cs_5_0",  // Entry point must match shader function name
         D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3, 0,
         blob.GetAddressOf(), errorBlob.GetAddressOf()
     );
@@ -262,7 +261,17 @@ void DMLDetector::releaseGpuResources() {
 }
 
 DetectionList DMLDetector::detect(const Frame& frame) {
-    if (!ready_ || frame.empty()) return {};
+    if (!ready_ || frame.empty()) {
+        LOG_ERROR("DMLDetector: Invalid frame");
+        return {};
+    }
+
+    // Get GPU texture from frame
+    auto gpuTexture = frame.getD3DTexture();
+    if (!gpuTexture) {
+        LOG_ERROR("DMLDetector: Frame missing GPU texture");
+        return {};
+    }
 
     auto startTotal = std::chrono::high_resolution_clock::now();
     stats_.totalTimeMs = 0.0f;
@@ -272,48 +281,43 @@ DetectionList DMLDetector::detect(const Frame& frame) {
 
     // Use internal config
     const auto& config = config_;
-    
+
     std::vector<float> inputTensorValues;
     size_t inputTensorSize = 1 * 3 * modelInfo_.inputHeight * modelInfo_.inputWidth;
 
     try {
         auto startPre = std::chrono::high_resolution_clock::now();
 
-        bool gpuPathUsed = false;
-        if (config.useGpuAcceleration && frame.gpuTexture) {
-            // HYBRID GPU PATH
+        // GPU-ONLY PATH (no CPU fallback)
+        if (config.useGpuAcceleration) {
             ComPtr<ID3D11Device> textureDevice;
-            frame.gpuTexture->GetDevice(textureDevice.GetAddressOf());
-            
+            gpuTexture->GetDevice(textureDevice.GetAddressOf());
+
             if (initGpuResources(textureDevice.Get())) {
                 D3D11_MAPPED_SUBRESOURCE map;
                 if (SUCCEEDED(gpu_.context->Map(gpu_.constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &map))) {
                     PreprocessConstants* cb = (PreprocessConstants*)map.pData;
-                    
+
                     D3D11_TEXTURE2D_DESC desc;
-                    frame.gpuTexture->GetDesc(&desc);
-                    
+                    gpuTexture->GetDesc(&desc);
+
                     cb->inputWidth = desc.Width;
                     cb->inputHeight = desc.Height;
                     cb->outputWidth = modelInfo_.inputWidth;
                     cb->outputHeight = modelInfo_.inputHeight;
-                    
-                    // Calculate ROI
-                    // Frame.width/height is the logical ROI size
-                    // Frame.roiX/Y needs to be added to Frame struct
-                    float fullW = static_cast<float>(desc.Width);
-                    float fullH = static_cast<float>(desc.Height);
-                    
-                    cb->roiLeft = static_cast<float>(frame.roiX) / fullW;
-                    cb->roiTop = static_cast<float>(frame.roiY) / fullH;
-                    cb->roiWidth = static_cast<float>(frame.width) / fullW;
-                    cb->roiHeight = static_cast<float>(frame.height) / fullH;
+
+                    // ROI is handled by preprocessing shader (InputPreprocessing.hlsl)
+                    // Use full texture as ROI (preprocessing shader crops as needed)
+                    cb->roiLeft = 0.0f;
+                    cb->roiTop = 0.0f;
+                    cb->roiWidth = 1.0f;
+                    cb->roiHeight = 1.0f;
 
                     gpu_.context->Unmap(gpu_.constantBuffer.Get(), 0);
                 }
 
                 ComPtr<ID3D11ShaderResourceView> srv;
-                if (SUCCEEDED(gpu_.device->CreateShaderResourceView(frame.gpuTexture.Get(), nullptr, srv.GetAddressOf()))) {
+                if (SUCCEEDED(gpu_.device->CreateShaderResourceView(gpuTexture, nullptr, srv.GetAddressOf()))) {
                     gpu_.context->CSSetShader(gpu_.computeShader.Get(), nullptr, 0);
                     ID3D11ShaderResourceView* srvs[] = { srv.Get() };
                     gpu_.context->CSSetShaderResources(0, 1, srvs);
@@ -337,26 +341,21 @@ DetectionList DMLDetector::detect(const Frame& frame) {
                         inputTensorValues.resize(inputTensorSize);
                         memcpy(inputTensorValues.data(), map.pData, inputTensorSize * sizeof(float));
                         gpu_.context->Unmap(gpu_.stagingBuffer.Get(), 0);
-                        gpuPathUsed = true;
+                    } else {
+                        LOG_ERROR("DMLDetector: Failed to map staging buffer");
+                        return {};
                     }
+                } else {
+                    LOG_ERROR("DMLDetector: Failed to create shader resource view");
+                    return {};
                 }
+            } else {
+                LOG_ERROR("DMLDetector: Failed to initialize GPU resources");
+                return {};
             }
-        }
-
-        if (!gpuPathUsed) {
-            cv::Mat resized;
-            cv::resize(frame.image, resized, cv::Size(modelInfo_.inputWidth, modelInfo_.inputHeight));
-            cv::cvtColor(resized, resized, cv::COLOR_BGR2RGB);
-            resized.convertTo(resized, CV_32FC3, 1.0f / 255.0f);
-
-            std::vector<cv::Mat> channels(3);
-            cv::split(resized, channels);
-            
-            inputTensorValues.resize(inputTensorSize);
-            size_t planeSize = static_cast<size_t>(modelInfo_.inputHeight) * modelInfo_.inputWidth;
-            for (int c = 0; c < 3; ++c) {
-                memcpy(&inputTensorValues[c * planeSize], channels[c].data, planeSize * sizeof(float));
-            }
+        } else {
+            LOG_ERROR("DMLDetector: GPU acceleration disabled - not supported in zero-copy architecture");
+            return {};
         }
 
         auto endPre = std::chrono::high_resolution_clock::now();
@@ -415,19 +414,21 @@ DetectionList DMLDetector::detect(const Frame& frame) {
             int height = static_cast<int>(h * config.detectionResolution);
 
             Detection d;
-            d.box = cv::Rect(x, y, width, height);
+            d.bbox = BBox{static_cast<float>(x), static_cast<float>(y),
+                         static_cast<float>(width), static_cast<float>(height)};
             d.confidence = maxClassScore;
             d.classId = maxClassId;
             detections.push_back(d);
         }
 
-        auto result = PostProcessor::applyNMS(detections, nmsThreshold);
+        // PostProcessor::applyNMS modifies detections in-place (returns void)
+        PostProcessor::applyNMS(detections, nmsThreshold);
         auto endPost = std::chrono::high_resolution_clock::now();
-        
+
         stats_.postProcessTimeMs = std::chrono::duration<float, std::milli>(endPost - startPost).count();
         stats_.totalTimeMs = std::chrono::duration<float, std::milli>(endPost - startTotal).count();
 
-        return result;
+        return detections;
 
     } catch (const std::exception& e) {
         std::cerr << "[DMLDetector] Detection error: " << e.what() << std::endl;
@@ -447,4 +448,4 @@ int DMLDetector::getNumberOfClasses() const {
     return modelInfo_.numClasses;
 }
 
-} // namespace sunone
+} // namespace macroman

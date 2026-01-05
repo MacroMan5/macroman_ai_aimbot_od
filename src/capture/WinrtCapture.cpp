@@ -34,7 +34,7 @@ extern "C" {
     };
 }
 
-namespace sunone {
+namespace macroman {
 
 class WinrtCapture::Impl {
 public:
@@ -508,4 +508,4 @@ void WinrtCapture::setCaptureEntireScreen(bool entire) {
     captureEntireScreen_ = entire;
 }
 
-} // namespace sunone
+} // namespace macroman

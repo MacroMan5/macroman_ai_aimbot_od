@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev, 'feature/**']
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+env:
+  CMAKE_VERSION: '3.25.0'
+  ONNXRUNTIME_VERSION: '1.22.0'
+  BUILD_TYPE: Release
+
+jobs:
+  build-and-test:
+    name: Build & Test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup CMake
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: ${{ env.CMAKE_VERSION }}
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ env.ONNXRUNTIME_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Install ONNX Runtime DirectML
+        shell: pwsh
+        run: |
+          Write-Host "Installing ONNX Runtime DirectML ${{ env.ONNXRUNTIME_VERSION }}..."
+          nuget install microsoft.ml.onnxruntime.directml `
+            -Version ${{ env.ONNXRUNTIME_VERSION }} `
+            -OutputDirectory $env:USERPROFILE\.nuget\packages
+
+          Write-Host "ONNX Runtime installed"
+
+      - name: Detect ONNX Runtime path
+        id: onnx-path
+        shell: pwsh
+        run: |
+          $version = "${{ env.ONNXRUNTIME_VERSION }}"
+          $onnxPath = Join-Path $env:USERPROFILE ".nuget\packages\microsoft.ml.onnxruntime.directml\$version"
+
+          if (-not (Test-Path $onnxPath)) {
+            Write-Error "ONNX Runtime not found at: $onnxPath"
+            exit 1
+          }
+
+          # Verify critical files exist
+          $dllPath = Join-Path $onnxPath "runtimes\win-x64\native\onnxruntime.dll"
+          $libPath = Join-Path $onnxPath "runtimes\win-x64\native\onnxruntime.lib"
+          $includeDir = Join-Path $onnxPath "build\native\include"
+
+          if (-not (Test-Path $dllPath)) {
+            Write-Error "Missing onnxruntime.dll at: $dllPath"
+            exit 1
+          }
+
+          if (-not (Test-Path $libPath)) {
+            Write-Error "Missing onnxruntime.lib at: $libPath"
+            exit 1
+          }
+
+          if (-not (Test-Path $includeDir)) {
+            Write-Error "Missing include directory at: $includeDir"
+            exit 1
+          }
+
+          # Convert to forward slashes for CMake
+          $onnxPathForward = $onnxPath -replace '\\', '/'
+
+          Write-Host "ONNX Runtime validated at: $onnxPathForward"
+          Write-Host "   DLL: $dllPath"
+          Write-Host "   LIB: $libPath"
+          Write-Host "   Include: $includeDir"
+
+          # Export for subsequent steps
+          echo "ONNXRUNTIME_ROOT=$onnxPathForward" >> $env:GITHUB_OUTPUT
+          echo "ONNXRUNTIME_ROOT=$onnxPathForward" >> $env:GITHUB_ENV
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          Write-Host "Configuring with ONNX Runtime at: $env:ONNXRUNTIME_ROOT"
+
+          cmake -B build -S . -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DONNXRUNTIME_ROOT="$env:ONNXRUNTIME_ROOT" `
+            -DENABLE_TESTS=ON `
+            -DENABLE_BENCHMARKS=ON `
+            -DENABLE_TENSORRT=OFF `
+            -DENABLE_OPENCV=OFF `
+            -DENABLE_ARDUINO=OFF
+
+      - name: Build project
+        run: cmake --build build --config Release -j
+
+      # Note: Integration tests, E2E tests, and benchmarks run via Git hooks (see .githooks/)
+      # CI focuses on fast unit tests + build verification only
+      - name: Run unit tests only
+        run: |
+          ctest --test-dir build -C Release --output-on-failure -L unit
+
+      - name: Upload build artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            build/CMakeFiles/CMakeOutput.log
+            build/CMakeFiles/CMakeError.log
+          retention-days: 7

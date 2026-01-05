@@ -6,7 +6,7 @@
 #include <optional>
 #include <chrono>
 
-namespace sunone {
+namespace macroman {
 
 template<typename T>
 class ThreadSafeQueue {
@@ -74,4 +74,4 @@ private:
     size_t maxSize_;
 };
 
-} // namespace sunone
+} // namespace macroman

@@ -13,7 +13,7 @@
 struct ID3D11Texture2D;
 struct cudaGraphicsResource;
 
-namespace sunone {
+namespace macroman {
 
 /**
  * TensorRT-based object detector for NVIDIA GPUs.
@@ -90,6 +90,6 @@ private:
     void unregisterTexture();
 };
 
-} // namespace sunone
+} // namespace macroman
 
 #endif // USE_CUDA

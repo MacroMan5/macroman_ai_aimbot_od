@@ -1,0 +1,83 @@
+#!/bin/bash
+# Pre-commit hook: Run full test suite locally before commit
+#
+# This hook runs ALL tests (unit + integration + benchmark smoke test)
+# to ensure code quality before commits reach the repository.
+#
+# CI/CD only runs fast unit tests for quick feedback.
+# Local enforcement ensures comprehensive testing before merge.
+#
+# To skip this hook in emergencies: git commit --no-verify
+
+set -e
+
+echo ""
+echo "=========================================="
+echo "  MacroMan Aimbot - Pre-Commit Checks"
+echo "=========================================="
+echo ""
+
+# Detect build directory
+BUILD_DIR=""
+if [ -d "build" ]; then
+    BUILD_DIR="build"
+elif [ -d "build-verify" ]; then
+    BUILD_DIR="build-verify"
+else
+    echo "❌ No build directory found (build/ or build-verify/)"
+    echo "   Run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release"
+    exit 1
+fi
+
+echo "📁 Using build directory: $BUILD_DIR"
+echo ""
+
+# Run unit tests
+echo "🔍 Running unit tests..."
+if ctest --test-dir "$BUILD_DIR" -C Release -L unit --output-on-failure; then
+    echo "✅ Unit tests passed"
+else
+    echo "❌ Unit tests failed!"
+    echo ""
+    echo "Fix the failing tests before committing."
+    echo "To skip this check (NOT RECOMMENDED): git commit --no-verify"
+    exit 1
+fi
+
+echo ""
+
+# Run integration tests
+echo "🔍 Running integration tests..."
+if ctest --test-dir "$BUILD_DIR" -C Release -L integration --output-on-failure; then
+    echo "✅ Integration tests passed"
+else
+    echo "❌ Integration tests failed!"
+    echo ""
+    echo "Fix the failing tests before committing."
+    echo "To skip this check (NOT RECOMMENDED): git commit --no-verify"
+    exit 1
+fi
+
+echo ""
+
+# Benchmark smoke test (verify executable runs)
+echo "🔍 Running benchmark smoke test..."
+BENCH_EXE="$BUILD_DIR/bin/Release/macroman-bench.exe"
+if [ -f "$BENCH_EXE" ]; then
+    if "$BENCH_EXE" --help > /dev/null 2>&1; then
+        echo "✅ Benchmark executable OK"
+    else
+        echo "⚠️  Benchmark executable failed to run"
+        echo "   This won't block the commit, but please investigate."
+    fi
+else
+    echo "⚠️  Benchmark executable not found (optional)"
+    echo "   Path: $BENCH_EXE"
+fi
+
+echo ""
+echo "=========================================="
+echo "✅ All pre-commit checks passed!"
+echo "=========================================="
+echo ""
+echo "Proceeding with commit..."

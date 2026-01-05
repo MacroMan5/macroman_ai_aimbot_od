@@ -3,12 +3,14 @@
 out/
 
 # Build artifacts
+build/
 *.exe
 *.dll
 *.lib
 *.obj
 *.pdb
 *.ilk
+nul
 
 # CMake
 CMakeCache.txt
@@ -28,3 +30,6 @@ cmake_install.cmake
 # Dependencies & Pre-compiled binaries
 external/
 modules/
+
+# Git worktrees (isolated development branches)
+.worktrees/

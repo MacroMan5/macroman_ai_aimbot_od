@@ -1010,13 +1010,13 @@ git commit -m "test: add integration test infrastructure with fake implementatio
 
 **Files:**
 - Create: `tests/benchmark/CMakeLists.txt`
-- Create: `tests/benchmark/sunone-bench.cpp`
+- Create: `tests/benchmark/macroman-bench.cpp`
 - Create: `tests/benchmark/BenchmarkRunner.h`
 - Create: `tests/benchmark/BenchmarkRunner.cpp`
 
 ### Step 1: Write benchmark main
 
-**File:** `tests/benchmark/sunone-bench.cpp`
+**File:** `tests/benchmark/macroman-bench.cpp`
 
 ```cpp
 #include "BenchmarkRunner.h"
@@ -1026,7 +1026,7 @@ git commit -m "test: add integration test infrastructure with fake implementatio
 
 int main(int argc, char** argv) {
     try {
-        cxxopts::Options options("sunone-bench", "Macroman AI Aimbot Benchmark Tool");
+        cxxopts::Options options("macroman-bench", "Macroman AI Aimbot Benchmark Tool");
 
         options.add_options()
             ("d,dataset", "Path to test dataset", cxxopts::value<std::string>())
@@ -1198,12 +1198,12 @@ float BenchmarkRunner::calculatePercentile(const std::vector<float>& data, float
 **File:** `tests/benchmark/CMakeLists.txt`
 
 ```cmake
-add_executable(sunone-bench
-    sunone-bench.cpp
+add_executable(macroman-bench
+    macroman-bench.cpp
     BenchmarkRunner.cpp
 )
 
-target_link_libraries(sunone-bench
+target_link_libraries(macroman-bench
     PRIVATE
         macroman_core
         macroman_capture
@@ -1212,14 +1212,14 @@ target_link_libraries(sunone-bench
         cxxopts::cxxopts
 )
 
-target_include_directories(sunone-bench
+target_include_directories(macroman-bench
     PRIVATE
         ${CMAKE_SOURCE_DIR}/extracted_modules
         ${CMAKE_SOURCE_DIR}/tests/integration
 )
 
 # Install benchmark tool
-install(TARGETS sunone-bench
+install(TARGETS macroman-bench
     RUNTIME DESTINATION bin
 )
 ```
@@ -1231,13 +1231,13 @@ Run:
 cmake --build build --config Release
 ```
 
-Expected: `sunone-bench.exe` created in `build/bin/`
+Expected: `macroman-bench.exe` created in `build/bin/`
 
 ### Step 6: Test benchmark tool (without dataset yet)
 
 Run:
 ```bash
-./build/bin/sunone-bench.exe --help
+./build/bin/macroman-bench.exe --help
 ```
 
 Expected: Help message displayed
@@ -1246,7 +1246,7 @@ Expected: Help message displayed
 
 ```bash
 git add tests/benchmark/
-git commit -m "feat: add CLI benchmark tool (sunone-bench) for performance regression testing"
+git commit -m "feat: add CLI benchmark tool (macroman-bench) for performance regression testing"
 ```
 
 ---
@@ -1489,7 +1489,7 @@ jobs:
         name: binaries-windows
         path: |
           build/bin/macroman_aimbot.exe
-          build/bin/sunone-bench.exe
+          build/bin/macroman-bench.exe
 ```
 
 ### Step 2: Write performance regression workflow
@@ -1546,7 +1546,7 @@ jobs:
     - name: Run performance benchmark
       id: benchmark
       run: |
-        ./build/bin/sunone-bench.exe `
+        ./build/bin/macroman-bench.exe `
           --dataset test_data/valorant_500frames.bin `
           --model models/valorant_yolov8_640.onnx `
           --threshold-avg-fps 120 `
@@ -2002,7 +2002,7 @@ ctest -C Release -R integration
 
 ### Run Performance Benchmark
 ```bash
-./bin/sunone-bench.exe \
+./bin/macroman-bench.exe \
   --dataset test_data/valorant_500frames.bin \
   --model models/valorant_yolov8_640.onnx \
   --threshold-avg-fps 120 \
@@ -2100,7 +2100,7 @@ cd build && ctest -C Release --output-on-failure
 
 ### Performance Benchmark
 ```bash
-./build/bin/sunone-bench.exe \
+./build/bin/macroman-bench.exe \
   --dataset test_data/valorant_500frames.bin \
   --model models/valorant_yolov8_640.onnx \
   --threshold-avg-fps 120 \
@@ -2128,7 +2128,7 @@ Expected: All tests pass
 
 Run:
 ```bash
-./bin/sunone-bench.exe --help
+./bin/macroman-bench.exe --help
 ```
 
 Expected: Help message displayed
@@ -2170,7 +2170,7 @@ ctest -C Release --output-on-failure
 # Verify binaries
 ls bin/unit_tests.exe
 ls bin/integration_tests.exe
-ls bin/sunone-bench.exe
+ls bin/macroman-bench.exe
 ls bin/record_dataset.exe
 ```
 

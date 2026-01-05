@@ -4,7 +4,7 @@
 #include <chrono>
 #include <string>
 
-namespace sunone {
+namespace macroman {
 
 class ITargetPredictor {
 public:
@@ -25,4 +25,4 @@ public:
     virtual bool isStable() const = 0;  // Enough data to predict?
 };
 
-} // namespace sunone
+} // namespace macroman
