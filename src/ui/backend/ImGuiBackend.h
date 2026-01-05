@@ -19,6 +19,7 @@ public:
     // Style
     void setDarkTheme();
     void setLightTheme();
+    void setTheme();  // P10-01: Cyberpunk theme with custom colors
 
     bool isInitialized() const { return initialized_; }
 
